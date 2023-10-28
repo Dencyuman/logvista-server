@@ -195,7 +195,7 @@ const docTemplate = `{
         },
         "/masters/levels": {
             "get": {
-                "description": "ログレベル一覧を取得する",
+                "description": "DB上に存在するログレベル一覧を取得する",
                 "consumes": [
                     "application/json"
                 ],
@@ -227,7 +227,7 @@ const docTemplate = `{
         },
         "/masters/systems": {
             "get": {
-                "description": "システム名一覧を取得する",
+                "description": "DB上に存在するシステム名一覧を取得する",
                 "consumes": [
                     "application/json"
                 ],

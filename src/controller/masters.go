@@ -10,7 +10,7 @@ import (
 )
 
 // @Summary ログレベル一覧取得
-// @Description ログレベル一覧を取得する
+// @Description DB上に存在するログレベル一覧を取得する
 // @Tags masters
 // @Accept json
 // @Produce json
@@ -28,7 +28,7 @@ func (ctrl *AppController) GetLevels(c *gin.Context) {
 }
 
 // @Summary システム名一覧取得
-// @Description システム名一覧を取得する
+// @Description DB上に存在するシステム名一覧を取得する
 // @Tags masters
 // @Accept json
 // @Produce json

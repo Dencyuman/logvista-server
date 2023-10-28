@@ -391,7 +391,7 @@ paths:
     get:
       consumes:
       - application/json
-      description: ログレベル一覧を取得する
+      description: DB上に存在するログレベル一覧を取得する
       produces:
       - application/json
       responses:
@@ -412,7 +412,7 @@ paths:
     get:
       consumes:
       - application/json
-      description: システム名一覧を取得する
+      description: DB上に存在するシステム名一覧を取得する
       produces:
       - application/json
       responses:
