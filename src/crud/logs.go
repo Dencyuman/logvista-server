@@ -4,6 +4,7 @@ import (
 	"errors"
 	"log"
 	"strings"
+	"time"
 
 	"github.com/Dencyuman/logvista-server/src/models"
 	"gorm.io/gorm"
@@ -46,8 +47,17 @@ func InsertLogWithTracebacks(db *gorm.DB, modelLog *models.Log) error {
 
 // FindLogsのオプション型
 type FindLogsOptions struct {
-	Limit  *int
-	Offset *int
+	Limit       *int
+	Offset      *int
+	StartDate   *time.Time // 検索する日付の開始範囲
+	EndDate     *time.Time // 検索する日付の終了範囲
+	LevelName   *string    // ログレベル
+	SystemName  *string    // システム名
+	ContainsMsg *string    // メッセージ内容を含むかどうか
+	ExcType     *string    // エラーの種類
+	ExcDetail   *string	   // エラーの詳細
+	FileName    *string    // ファイル名
+	Lineno      *int       // エラーが発生した行番号
 }
 
 // Logデータをデータベースから取得する
@@ -56,7 +66,6 @@ func FindLogs(db *gorm.DB, opts *FindLogsOptions) ([]models.Log, error) {
 		opts = &FindLogsOptions{}
 	}
 
-	// Preloadでリレーション先のトレースバックも取得
 	query := db.Table("logs").Preload("ExcTraceback")
 
 	if opts.Limit != nil {
@@ -65,6 +74,42 @@ func FindLogs(db *gorm.DB, opts *FindLogsOptions) ([]models.Log, error) {
 
 	if opts.Offset != nil {
 		query = query.Offset(*opts.Offset)
+	}
+
+	if opts.StartDate != nil {
+		query = query.Where("timestamp >= ?", *opts.StartDate)
+	}
+
+	if opts.EndDate != nil {
+		query = query.Where("timestamp <= ?", *opts.EndDate)
+	}
+
+	if opts.LevelName != nil {
+		query = query.Where("level_name = ?", *opts.LevelName)
+	}
+
+	if opts.SystemName != nil {
+		query = query.Where("system_name = ?", *opts.SystemName)
+	}
+
+	if opts.ContainsMsg != nil {
+		query = query.Where("message LIKE ?", "%"+*opts.ContainsMsg+"%")
+	}
+
+	if opts.ExcType != nil {
+		query = query.Where("exc_type = ?", *opts.ExcType)
+	}
+
+	if opts.ExcDetail != nil {
+		query = query.Where("exc_detail LIKE ?", "%"+*opts.ExcDetail+"%")
+	}
+
+	if opts.FileName != nil {
+		query = query.Where("file_name = ?", *opts.FileName)
+	}
+
+	if opts.Lineno != nil {
+		query = query.Where("lineno = ?", *opts.Lineno)
 	}
 
 	var logs []models.Log

@@ -40,7 +40,7 @@ const docTemplate = `{
         },
         "/logs/": {
             "get": {
-                "description": "蓄積されているログ情報の一覧を取得する",
+                "description": "蓄積されているログ情報を取得する。クエリパラメータでフィルタリングが可能。",
                 "consumes": [
                     "application/json"
                 ],
@@ -50,19 +50,97 @@ const docTemplate = `{
                 "tags": [
                     "logs"
                 ],
-                "summary": "log情報取得用エンドポイント",
+                "summary": "取得ログ情報",
+                "parameters": [
+                    {
+                        "minimum": 1,
+                        "type": "integer",
+                        "default": 1,
+                        "description": "現在のページ",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "minimum": 1,
+                        "type": "integer",
+                        "default": 10,
+                        "description": "1ページあたりのアイテム数",
+                        "name": "pageSize",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "検索する日付の開始範囲 (形式: YYYY-MM-DDTHH:MM:SSZ)",
+                        "name": "startDate",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "検索する日付の終了範囲 (形式: YYYY-MM-DDTHH:MM:SSZ)",
+                        "name": "endDate",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "ログレベルでのフィルタ",
+                        "name": "levelName",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "システム名でのフィルタ",
+                        "name": "systemName",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "メッセージ内容の部分一致フィルタ",
+                        "name": "containMsg",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "エラーの種類でのフィルタ",
+                        "name": "excType",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "エラーの詳細でのキーワード部分一致フィルタ",
+                        "name": "excDetail",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "ファイル名でのフィルタ",
+                        "name": "fileName",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "エラーが発生した行番号でのフィルタ",
+                        "name": "lineno",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/schemas.LogResponse"
+                                "$ref": "#/definitions/schemas.PaginatedLogResponse"
                             }
                         }
                     },
                     "400": {
                         "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/schemas.ErrorResponse"
                         }
@@ -391,6 +469,38 @@ const docTemplate = `{
                 }
             }
         },
+        "schemas.PaginatedLogResponse": {
+            "type": "object",
+            "properties": {
+                "items": {
+                    "description": "ログの配列",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/schemas.LogResponse"
+                    }
+                },
+                "limit": {
+                    "description": "1ページあたりのアイテム数",
+                    "type": "integer",
+                    "example": 10
+                },
+                "page": {
+                    "description": "現在のページ数",
+                    "type": "integer",
+                    "example": 1
+                },
+                "total": {
+                    "description": "総アイテム数",
+                    "type": "integer",
+                    "example": 100
+                },
+                "total_pages": {
+                    "description": "総ページ数",
+                    "type": "integer",
+                    "example": 10
+                }
+            }
+        },
         "schemas.ResponseMessage": {
             "type": "object",
             "properties": {
@@ -422,15 +532,7 @@ const docTemplate = `{
         },
         "schemas.TracebackResponse": {
             "type": "object",
-            "required": [
-                "created_at",
-                "updated_at"
-            ],
             "properties": {
-                "created_at": {
-                    "type": "string",
-                    "example": "2023-01-01T00:00:00.000000+09:00"
-                },
                 "tb_filename": {
                     "type": "string",
                     "example": "C:\\User\\USER\\sample.py"
@@ -446,10 +548,6 @@ const docTemplate = `{
                 "tb_name": {
                     "type": "string",
                     "example": "\u003cmodule\u003e"
-                },
-                "updated_at": {
-                    "type": "string",
-                    "example": "2023-01-01T00:00:00.000000+09:00"
                 }
             }
         }
