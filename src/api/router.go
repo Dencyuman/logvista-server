@@ -29,6 +29,10 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 			logsGroup.POST("/python-logvista", appController.RecordLogs)
 			logsGroup.GET("/", appController.GetLogs)
 		}
+		masterGroup := v1.Group("/masters")
+		{
+			masterGroup.GET("/systems", appController.GetSystems)
+		}
 	}
 
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
