@@ -6,6 +6,7 @@ import (
 
 	crud "github.com/Dencyuman/logvista-server/src/crud"
 	schemas "github.com/Dencyuman/logvista-server/src/schemas"
+	utils "github.com/Dencyuman/logvista-server/src/utils"
 	gin "github.com/gin-gonic/gin"
 )
 
@@ -24,7 +25,8 @@ func (ctrl *AppController) GetErrorTypes(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, schemas.ErrorResponse{Message: "Internal Server Error"})
 		return
 	}
-	c.JSON(http.StatusOK, errorTypes)
+	errorTypesWithoutEmpty := utils.FilterEmptyStrings(errorTypes)
+	c.JSON(http.StatusOK, errorTypesWithoutEmpty)
 }
 
 // @Summary ファイル名一覧取得
@@ -42,7 +44,8 @@ func (ctrl *AppController) GetFiles(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, schemas.ErrorResponse{Message: "Internal Server Error"})
 		return
 	}
-	c.JSON(http.StatusOK, files)
+	filesWithoutEmpty := utils.FilterEmptyStrings(files)
+	c.JSON(http.StatusOK, filesWithoutEmpty)
 }
 
 // @Summary ログレベル一覧取得
@@ -60,7 +63,8 @@ func (ctrl *AppController) GetLevels(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, schemas.ErrorResponse{Message: "Internal Server Error"})
 		return
 	}
-	c.JSON(http.StatusOK, levels)
+	levelsWithoutEmpty := utils.FilterEmptyStrings(levels)
+	c.JSON(http.StatusOK, levelsWithoutEmpty)
 }
 
 // @Summary システム名一覧取得
@@ -78,5 +82,6 @@ func (ctrl *AppController) GetSystems(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, schemas.ErrorResponse{Message: "Internal Server Error"})
 		return
 	}
-	c.JSON(http.StatusOK, systems)
+	systemsWithoutEmpty := utils.FilterEmptyStrings(systems)
+	c.JSON(http.StatusOK, systemsWithoutEmpty)
 }
