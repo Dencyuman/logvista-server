@@ -408,6 +408,27 @@ paths:
       summary: エラー型名一覧取得
       tags:
       - masters
+  /masters/files:
+    get:
+      consumes:
+      - application/json
+      description: DB上に存在するファイル名一覧を取得する
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              type: string
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+      summary: ファイル名一覧取得
+      tags:
+      - masters
   /masters/levels:
     get:
       consumes:
