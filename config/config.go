@@ -1,34 +1,43 @@
 package config
 
 import (
-	"github.com/joho/godotenv"
+	"gopkg.in/yaml.v2"
 	"log"
 	"os"
+	"time"
 )
 
 type Config struct {
-	Host     string
-	User     string
-	Password string
-	Dbname   string
-	Port     string
-	Sslmode  string
+	Host     string `yaml:"host"`
+	Port     string `yaml:"port"`
+	User     string `yaml:"db_user"`
+	Password string `yaml:"db_password"`
+	Dbname   string `yaml:"db_name"`
+	Sslmode  string `yaml:"db_sslmode"`
 }
 
 func newConfig() *Config {
-	err := godotenv.Load()
+	cfg := &Config{}
+
+	// config.yamlファイルを読み取る
+	data, err := os.ReadFile("config.yaml")
 	if err != nil {
-		log.Fatal("Error loading .env file")
+		logAndExit("config.yamlの読み込みに失敗しました\nError: %v", err)
 	}
 
-	return &Config{
-		Host:     os.Getenv("HOST"),
-		User:     os.Getenv("USER"),
-		Password: os.Getenv("PASSWORD"),
-		Dbname:   os.Getenv("DBNAME"),
-		Port:     os.Getenv("PORT"),
-		Sslmode:  os.Getenv("SSLMODE"),
+	// YAMLを構造体にアンマーシャル
+	err = yaml.Unmarshal(data, cfg)
+	if err != nil {
+		logAndExit("config.yamlの解析に失敗しました\nError: %v", err)
 	}
+
+	return cfg
+}
+
+func logAndExit(format string, v ...interface{}) {
+	log.Printf(format, v...)
+	time.Sleep(5 * time.Second)
+	os.Exit(1)
 }
 
 var AppConfig = newConfig()
