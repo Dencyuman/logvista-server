@@ -187,6 +187,38 @@
                 }
             }
         },
+        "/masters/levels": {
+            "get": {
+                "description": "ログレベル一覧を取得する",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "masters"
+                ],
+                "summary": "ログレベル一覧取得",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/masters/systems": {
             "get": {
                 "description": "システム名一覧を取得する",

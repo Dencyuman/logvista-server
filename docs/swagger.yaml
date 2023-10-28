@@ -387,6 +387,27 @@ paths:
       summary: python-logvista用エンドポイント
       tags:
       - logs
+  /masters/levels:
+    get:
+      consumes:
+      - application/json
+      description: ログレベル一覧を取得する
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              type: string
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+      summary: ログレベル一覧取得
+      tags:
+      - masters
   /masters/systems:
     get:
       consumes:

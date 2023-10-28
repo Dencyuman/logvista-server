@@ -9,6 +9,24 @@ import (
 	gin "github.com/gin-gonic/gin"
 )
 
+// @Summary ログレベル一覧取得
+// @Description ログレベル一覧を取得する
+// @Tags masters
+// @Accept json
+// @Produce json
+// @Router /masters/levels [get]
+// @Success 200 {object} []string
+// @Failure 500 {object} schemas.ErrorResponse
+func (ctrl *AppController) GetLevels(c *gin.Context) {
+	levels, err := crud.FindLevels(ctrl.DB)
+	if err != nil {
+		log.Printf("Error finding levels: %v\n", err)
+		c.JSON(http.StatusInternalServerError, schemas.ErrorResponse{Message: "Internal Server Error"})
+		return
+	}
+	c.JSON(http.StatusOK, levels)
+}
+
 // @Summary システム名一覧取得
 // @Description システム名一覧を取得する
 // @Tags masters
