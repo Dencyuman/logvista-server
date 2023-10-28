@@ -33,6 +33,7 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 		{
 			masterGroup.GET("/levels", appController.GetLevels)
 			masterGroup.GET("/systems", appController.GetSystems)
+			masterGroup.GET("/error-types", appController.GetErrorTypes)
 		}
 	}
 

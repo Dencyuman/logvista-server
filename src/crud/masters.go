@@ -21,3 +21,12 @@ func FindSystems(db *gorm.DB) ([]string, error) {
 	}
 	return systems, nil
 }
+
+// DB上に存在するエラー型名一覧を取得する
+func FindErrorTypes(db *gorm.DB) ([]string, error) {
+	var errorTypes []string
+	if err := db.Table("logs").Distinct("exc_type").Pluck("exc_type", &errorTypes).Error; err != nil {
+		return nil, err
+	}
+	return errorTypes, nil
+}

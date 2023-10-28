@@ -193,6 +193,38 @@ const docTemplate = `{
                 }
             }
         },
+        "/masters/error-types": {
+            "get": {
+                "description": "DB上に存在するエラー型名一覧を取得する",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "masters"
+                ],
+                "summary": "エラー型名一覧取得",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/masters/levels": {
             "get": {
                 "description": "DB上に存在するログレベル一覧を取得する",
