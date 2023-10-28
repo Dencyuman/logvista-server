@@ -1,0 +1,451 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "This is LogVista server.",
+        "title": "LogVista API",
+        "contact": {},
+        "version": "0.0.1"
+    },
+    "host": "127.0.0.1:8080",
+    "basePath": "/api/v1",
+    "paths": {
+        "/healthcheck": {
+            "get": {
+                "description": "200 OKが返ってくれば起動済み",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "general"
+                ],
+                "summary": "ヘルスチェック用エンドポイント",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ResponseMessage"
+                        }
+                    }
+                }
+            }
+        },
+        "/logs/": {
+            "get": {
+                "description": "蓄積されているログ情報の一覧を取得する",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "logs"
+                ],
+                "summary": "log情報取得用エンドポイント",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/schemas.LogResponse"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/logs/python-logvista": {
+            "post": {
+                "description": "json形式の配列で受け取ったログ情報を記録する",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "logs"
+                ],
+                "summary": "python-logvista用エンドポイント",
+                "parameters": [
+                    {
+                        "description": "ログデータ",
+                        "name": "logs",
+                        "in": "body",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/schemas.Log"
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/schemas.LogResponse"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "schemas.ErrorResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "schemas.Log": {
+            "type": "object",
+            "required": [
+                "id",
+                "level_name",
+                "timestamp"
+            ],
+            "properties": {
+                "attributes": {
+                    "type": "object",
+                    "additionalProperties": true
+                },
+                "available_memory": {
+                    "type": "integer",
+                    "example": 8000000
+                },
+                "cpu_idle_time": {
+                    "type": "number",
+                    "example": 10000
+                },
+                "cpu_percent": {
+                    "type": "number",
+                    "example": 0
+                },
+                "cpu_system_time": {
+                    "type": "number",
+                    "example": 500
+                },
+                "cpu_user_time": {
+                    "type": "number",
+                    "example": 700
+                },
+                "exc_detail": {
+                    "type": "string",
+                    "example": "Some traceback details here"
+                },
+                "exc_traceback": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/schemas.Traceback"
+                    }
+                },
+                "exc_type": {
+                    "type": "string",
+                    "example": "Exception"
+                },
+                "exc_value": {
+                    "type": "string",
+                    "example": "sample"
+                },
+                "file_name": {
+                    "type": "string",
+                    "example": "sample.py"
+                },
+                "free_memory": {
+                    "type": "integer",
+                    "example": 8000000
+                },
+                "func_name": {
+                    "type": "string",
+                    "example": "\u003cmodule\u003e"
+                },
+                "id": {
+                    "type": "string",
+                    "example": "00000000-0000-0000-0000-000000000000"
+                },
+                "level_name": {
+                    "type": "string",
+                    "example": "INFO"
+                },
+                "levelno": {
+                    "type": "integer",
+                    "example": 20
+                },
+                "lineno": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "memory_percent": {
+                    "type": "number",
+                    "example": 50
+                },
+                "message": {
+                    "type": "string",
+                    "example": "sample message"
+                },
+                "module": {
+                    "type": "string",
+                    "example": "sample"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "sample"
+                },
+                "process": {
+                    "type": "integer",
+                    "example": 1000
+                },
+                "process_name": {
+                    "type": "string",
+                    "example": "MainProcess"
+                },
+                "system_name": {
+                    "type": "string",
+                    "example": "sample_system"
+                },
+                "thread": {
+                    "type": "integer",
+                    "example": 10000
+                },
+                "thread_name": {
+                    "type": "string",
+                    "example": "MainThread"
+                },
+                "timestamp": {
+                    "type": "string",
+                    "example": "2023-01-01T00:00:00.000000+09:00"
+                },
+                "total_memory": {
+                    "type": "integer",
+                    "example": 16000000
+                },
+                "used_memory": {
+                    "type": "integer",
+                    "example": 8000000
+                }
+            }
+        },
+        "schemas.LogResponse": {
+            "type": "object",
+            "required": [
+                "created_at",
+                "id",
+                "level_name",
+                "timestamp",
+                "updated_at"
+            ],
+            "properties": {
+                "attributes": {
+                    "type": "object",
+                    "additionalProperties": true
+                },
+                "available_memory": {
+                    "type": "integer",
+                    "example": 8000000
+                },
+                "cpu_idle_time": {
+                    "type": "number",
+                    "example": 10000
+                },
+                "cpu_percent": {
+                    "type": "number",
+                    "example": 0
+                },
+                "cpu_system_time": {
+                    "type": "number",
+                    "example": 500
+                },
+                "cpu_user_time": {
+                    "type": "number",
+                    "example": 700
+                },
+                "created_at": {
+                    "type": "string",
+                    "example": "2023-01-01T00:00:00.000000+09:00"
+                },
+                "exc_detail": {
+                    "type": "string",
+                    "example": "Some traceback details here"
+                },
+                "exc_traceback": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/schemas.TracebackResponse"
+                    }
+                },
+                "exc_type": {
+                    "type": "string",
+                    "example": "Exception"
+                },
+                "exc_value": {
+                    "type": "string",
+                    "example": "sample"
+                },
+                "file_name": {
+                    "type": "string",
+                    "example": "sample.py"
+                },
+                "free_memory": {
+                    "type": "integer",
+                    "example": 8000000
+                },
+                "func_name": {
+                    "type": "string",
+                    "example": "\u003cmodule\u003e"
+                },
+                "id": {
+                    "type": "string",
+                    "example": "00000000-0000-0000-0000-000000000000"
+                },
+                "level_name": {
+                    "type": "string",
+                    "example": "INFO"
+                },
+                "levelno": {
+                    "type": "integer",
+                    "example": 20
+                },
+                "lineno": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "memory_percent": {
+                    "type": "number",
+                    "example": 50
+                },
+                "message": {
+                    "type": "string",
+                    "example": "sample message"
+                },
+                "module": {
+                    "type": "string",
+                    "example": "sample"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "sample"
+                },
+                "process": {
+                    "type": "integer",
+                    "example": 1000
+                },
+                "process_name": {
+                    "type": "string",
+                    "example": "MainProcess"
+                },
+                "system_name": {
+                    "type": "string",
+                    "example": "sample_system"
+                },
+                "thread": {
+                    "type": "integer",
+                    "example": 10000
+                },
+                "thread_name": {
+                    "type": "string",
+                    "example": "MainThread"
+                },
+                "timestamp": {
+                    "type": "string",
+                    "example": "2023-01-01T00:00:00.000000+09:00"
+                },
+                "total_memory": {
+                    "type": "integer",
+                    "example": 16000000
+                },
+                "updated_at": {
+                    "type": "string",
+                    "example": "2023-01-01T00:00:00.000000+09:00"
+                },
+                "used_memory": {
+                    "type": "integer",
+                    "example": 8000000
+                }
+            }
+        },
+        "schemas.ResponseMessage": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "schemas.Traceback": {
+            "type": "object",
+            "properties": {
+                "tb_filename": {
+                    "type": "string",
+                    "example": "C:\\User\\USER\\sample.py"
+                },
+                "tb_line": {
+                    "type": "string",
+                    "example": "raise Exception(\"sample\")"
+                },
+                "tb_lineno": {
+                    "type": "integer",
+                    "example": 31
+                },
+                "tb_name": {
+                    "type": "string",
+                    "example": "\u003cmodule\u003e"
+                }
+            }
+        },
+        "schemas.TracebackResponse": {
+            "type": "object",
+            "required": [
+                "created_at",
+                "updated_at"
+            ],
+            "properties": {
+                "created_at": {
+                    "type": "string",
+                    "example": "2023-01-01T00:00:00.000000+09:00"
+                },
+                "tb_filename": {
+                    "type": "string",
+                    "example": "C:\\User\\USER\\sample.py"
+                },
+                "tb_line": {
+                    "type": "string",
+                    "example": "raise Exception(\"sample\")"
+                },
+                "tb_lineno": {
+                    "type": "integer",
+                    "example": 31
+                },
+                "tb_name": {
+                    "type": "string",
+                    "example": "\u003cmodule\u003e"
+                },
+                "updated_at": {
+                    "type": "string",
+                    "example": "2023-01-01T00:00:00.000000+09:00"
+                }
+            }
+        }
+    }
+}
