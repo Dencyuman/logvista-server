@@ -54,17 +54,17 @@ func (ctrl *AppController) RecordLogs(c *gin.Context) {
 
 // GetLogsのパラメータ型
 type getLogsParams struct {
-	Page        int       `form:"page,default=1" binding:"min=1"` // 現在のページ
-	PageSize    int       `form:"pageSize,default=10" binding:"min=1"` // 1ページあたりのアイテム数
-	StartDate   *time.Time `form:"startDate"` // 検索する日付の開始範囲
-	EndDate     *time.Time `form:"endDate"` // 検索する日付の終了範囲
-	LevelName   *string    `form:"levelName"` // ログレベル
-	SystemName  *string    `form:"systemName"` // システム名
-	ContainsMsg *string    `form:"containMsg"` // メッセージ内容を含むかどうか
-	ExcType     *string    `form:"excType"` // エラーの種類
-	ExcDetail   *string	   `form:"excDetail"` // エラーの詳細
-	FileName    *string    `form:"fileName"` // ファイル名
-	Lineno      *int       `form:"lineno"` // エラーが発生した行番号
+	Page        int        `form:"page,default=1" binding:"min=1"`      // 現在のページ
+	PageSize    int        `form:"pageSize,default=10" binding:"min=1"` // 1ページあたりのアイテム数
+	StartDate   *time.Time `form:"startDate"`                           // 検索する日付の開始範囲
+	EndDate     *time.Time `form:"endDate"`                             // 検索する日付の終了範囲
+	LevelName   *string    `form:"levelName"`                           // ログレベル
+	SystemName  *string    `form:"systemName"`                          // システム名
+	ContainsMsg *string    `form:"containMsg"`                          // メッセージ内容を含むかどうか
+	ExcType     *string    `form:"excType"`                             // エラーの種類
+	ExcDetail   *string    `form:"excDetail"`                           // エラーの詳細
+	FileName    *string    `form:"fileName"`                            // ファイル名
+	Lineno      *int       `form:"lineno"`                              // エラーが発生した行番号
 }
 
 // @Summary 取得ログ情報
@@ -145,11 +145,11 @@ func (ctrl *AppController) GetLogs(c *gin.Context) {
 
 	// ページネーション用のレスポンスを作成
 	paginatedResponse := schemas.PaginatedLogResponse{
-		Total: len(allModelLogs),
-		Page: params.Page,
-		Limit: params.PageSize,
-		TotalPages: len(allModelLogs) / params.PageSize + 1,
-		Items: schemaLogs,
+		Total:      len(allModelLogs),
+		Page:       params.Page,
+		Limit:      params.PageSize,
+		TotalPages: len(allModelLogs)/params.PageSize + 1,
+		Items:      schemaLogs,
 	}
 	c.JSON(http.StatusOK, paginatedResponse)
 }

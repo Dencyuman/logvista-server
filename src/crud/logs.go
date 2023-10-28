@@ -55,7 +55,7 @@ type FindLogsOptions struct {
 	SystemName  *string    // システム名
 	ContainsMsg *string    // メッセージ内容を含むかどうか
 	ExcType     *string    // エラーの種類
-	ExcDetail   *string	   // エラーの詳細
+	ExcDetail   *string    // エラーの詳細
 	FileName    *string    // ファイル名
 	Lineno      *int       // エラーが発生した行番号
 }

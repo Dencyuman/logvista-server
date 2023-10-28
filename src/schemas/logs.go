@@ -68,9 +68,9 @@ type TracebackResponse struct {
 
 // swagger:response paginatedLogResponse
 type PaginatedLogResponse struct {
-	Total       int           `json:"total" example:"100"` // 総アイテム数
-	Page        int           `json:"page" example:"1"`    // 現在のページ数
-	Limit       int           `json:"limit" example:"10"`  // 1ページあたりのアイテム数
-	TotalPages  int           `json:"total_pages" example:"10"` // 総ページ数
-	Items       []LogResponse `json:"items"`               // ログの配列
+	Total      int           `json:"total" example:"100"`      // 総アイテム数
+	Page       int           `json:"page" example:"1"`         // 現在のページ数
+	Limit      int           `json:"limit" example:"10"`       // 1ページあたりのアイテム数
+	TotalPages int           `json:"total_pages" example:"10"` // 総ページ数
+	Items      []LogResponse `json:"items"`                    // ログの配列
 }
