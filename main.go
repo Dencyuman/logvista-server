@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"log"
 
 	api "github.com/Dencyuman/logvista-server/src/api"
@@ -13,6 +14,9 @@ import (
 // @host 127.0.0.1:8080
 // @BasePath /api/v1
 func main() {
+	seed := flag.Bool("seed", false, "Set to true to seed the database")
+	flag.Parse()
+
 	db, err := initializeDB()
 	if err != nil {
 		log.Fatal("Failed to connect to the database:", err)
@@ -21,8 +25,15 @@ func main() {
 	if err != nil {
 		log.Fatal("Failed to migrate the database:", err)
 	}
-	router := api.SetupRouter(db)
 
-	// fmt.Println(db) // If you don't need this, comment or remove
-	router.Run(":8080")
+	if *seed {
+		err = database.Seed(db)
+		if err != nil {
+			log.Fatal("Failed to seed the database:", err)
+		}
+	} else {
+		router := api.SetupRouter(db)
+		router.Run(":8080")
+	}
+
 }

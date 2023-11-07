@@ -34,3 +34,12 @@ func Migrate(db *gorm.DB) error {
 	}
 	return nil
 }
+
+func ResetTables(db *gorm.DB) error {
+	err := db.Migrator().DropTable(&models.Log{}, &models.Traceback{}, &models.System{})
+	if err != nil {
+		log.Println("Failed to reset tables:", err)
+		return err
+	}
+	return nil
+}
