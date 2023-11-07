@@ -27,7 +27,7 @@ func Connect() (*gorm.DB, error) {
 }
 
 func Migrate(db *gorm.DB) error {
-	err := db.AutoMigrate(&models.Log{}, &models.Traceback{})
+	err := db.AutoMigrate(&models.Log{}, &models.Traceback{}, &models.System{})
 	if err != nil {
 		log.Println("Migration failed:", err)
 		return err

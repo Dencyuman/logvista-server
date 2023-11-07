@@ -66,22 +66,3 @@ func (ctrl *AppController) GetLevels(c *gin.Context) {
 	levelsWithoutEmpty := utils.FilterEmptyStrings(levels)
 	c.JSON(http.StatusOK, levelsWithoutEmpty)
 }
-
-// @Summary システム名一覧取得
-// @Description DB上に存在するシステム名一覧を取得する
-// @Tags masters
-// @Accept json
-// @Produce json
-// @Router /masters/systems [get]
-// @Success 200 {object} []string
-// @Failure 500 {object} schemas.ErrorResponse
-func (ctrl *AppController) GetSystems(c *gin.Context) {
-	systems, err := crud.FindSystems(ctrl.DB)
-	if err != nil {
-		log.Printf("Error finding systems: %v\n", err)
-		c.JSON(http.StatusInternalServerError, schemas.ErrorResponse{Message: "Internal Server Error"})
-		return
-	}
-	systemsWithoutEmpty := utils.FilterEmptyStrings(systems)
-	c.JSON(http.StatusOK, systemsWithoutEmpty)
-}

@@ -289,9 +289,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/masters/systems": {
+        "/systems/": {
             "get": {
-                "description": "DB上に存在するシステム名一覧を取得する",
+                "description": "DB上に存在するシステム一覧を取得する",
                 "consumes": [
                     "application/json"
                 ],
@@ -299,16 +299,16 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "masters"
+                    "systems"
                 ],
-                "summary": "システム名一覧取得",
+                "summary": "システム一覧取得",
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
                             "type": "array",
                             "items": {
-                                "type": "string"
+                                "$ref": "#/definitions/schemas.SystemResponse"
                             }
                         }
                     },
@@ -637,6 +637,36 @@ const docTemplate = `{
                 }
             }
         },
+        "schemas.SystemResponse": {
+            "type": "object",
+            "required": [
+                "created_at",
+                "id",
+                "updated_at"
+            ],
+            "properties": {
+                "category": {
+                    "type": "string",
+                    "example": "API Server"
+                },
+                "created_at": {
+                    "type": "string",
+                    "example": "2023-01-01T00:00:00.000000+09:00"
+                },
+                "id": {
+                    "type": "string",
+                    "example": "00000000-0000-0000-0000-000000000000"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "sample_system"
+                },
+                "updated_at": {
+                    "type": "string",
+                    "example": "2023-01-01T00:00:00.000000+09:00"
+                }
+            }
+        },
         "schemas.Traceback": {
             "type": "object",
             "properties": {
@@ -684,7 +714,7 @@ const docTemplate = `{
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
-	Version:          "0.1.0",
+	Version:          "0.1.2",
 	Host:             "127.0.0.1:8080",
 	BasePath:         "/api/v1",
 	Schemes:          []string{},

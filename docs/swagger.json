@@ -4,7 +4,7 @@
         "description": "This is LogVista server.",
         "title": "LogVista API",
         "contact": {},
-        "version": "0.1.0"
+        "version": "0.1.2"
     },
     "host": "127.0.0.1:8080",
     "basePath": "/api/v1",
@@ -283,9 +283,9 @@
                 }
             }
         },
-        "/masters/systems": {
+        "/systems/": {
             "get": {
-                "description": "DB上に存在するシステム名一覧を取得する",
+                "description": "DB上に存在するシステム一覧を取得する",
                 "consumes": [
                     "application/json"
                 ],
@@ -293,16 +293,16 @@
                     "application/json"
                 ],
                 "tags": [
-                    "masters"
+                    "systems"
                 ],
-                "summary": "システム名一覧取得",
+                "summary": "システム一覧取得",
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
                             "type": "array",
                             "items": {
-                                "type": "string"
+                                "$ref": "#/definitions/schemas.SystemResponse"
                             }
                         }
                     },
@@ -628,6 +628,36 @@
             "properties": {
                 "message": {
                     "type": "string"
+                }
+            }
+        },
+        "schemas.SystemResponse": {
+            "type": "object",
+            "required": [
+                "created_at",
+                "id",
+                "updated_at"
+            ],
+            "properties": {
+                "category": {
+                    "type": "string",
+                    "example": "API Server"
+                },
+                "created_at": {
+                    "type": "string",
+                    "example": "2023-01-01T00:00:00.000000+09:00"
+                },
+                "id": {
+                    "type": "string",
+                    "example": "00000000-0000-0000-0000-000000000000"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "sample_system"
+                },
+                "updated_at": {
+                    "type": "string",
+                    "example": "2023-01-01T00:00:00.000000+09:00"
                 }
             }
         },

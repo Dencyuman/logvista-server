@@ -232,6 +232,28 @@ definitions:
       message:
         type: string
     type: object
+  schemas.SystemResponse:
+    properties:
+      category:
+        example: API Server
+        type: string
+      created_at:
+        example: "2023-01-01T00:00:00.000000+09:00"
+        type: string
+      id:
+        example: 00000000-0000-0000-0000-000000000000
+        type: string
+      name:
+        example: sample_system
+        type: string
+      updated_at:
+        example: "2023-01-01T00:00:00.000000+09:00"
+        type: string
+    required:
+    - created_at
+    - id
+    - updated_at
+    type: object
   schemas.Traceback:
     properties:
       tb_filename:
@@ -267,7 +289,7 @@ info:
   contact: {}
   description: This is LogVista server.
   title: LogVista API
-  version: 0.1.0
+  version: 0.1.2
 paths:
   /healthcheck:
     get:
@@ -450,11 +472,11 @@ paths:
       summary: ログレベル一覧取得
       tags:
       - masters
-  /masters/systems:
+  /systems/:
     get:
       consumes:
       - application/json
-      description: DB上に存在するシステム名一覧を取得する
+      description: DB上に存在するシステム一覧を取得する
       produces:
       - application/json
       responses:
@@ -462,13 +484,13 @@ paths:
           description: OK
           schema:
             items:
-              type: string
+              $ref: '#/definitions/schemas.SystemResponse'
             type: array
         "500":
           description: Internal Server Error
           schema:
             $ref: '#/definitions/schemas.ErrorResponse'
-      summary: システム名一覧取得
+      summary: システム一覧取得
       tags:
-      - masters
+      - systems
 swagger: "2.0"

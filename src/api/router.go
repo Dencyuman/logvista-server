@@ -36,6 +36,10 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 			masterGroup.GET("/levels", appController.GetLevels)
 			masterGroup.GET("/systems", appController.GetSystems)
 		}
+		systemsGroup := v1.Group("/systems")
+		{
+			systemsGroup.GET("/", appController.GetSystems)
+		}
 	}
 
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))

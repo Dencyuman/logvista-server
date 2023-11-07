@@ -4,6 +4,8 @@ import (
 	"log"
 	http "net/http"
 	"time"
+	gorm "gorm.io/gorm"
+	"errors"
 
 	converter "github.com/Dencyuman/logvista-server/src/converter"
 	crud "github.com/Dencyuman/logvista-server/src/crud"
@@ -27,6 +29,26 @@ func (ctrl *AppController) RecordLogs(c *gin.Context) {
 		log.Printf("Error binding JSON: %v\n", err)
 		c.JSON(http.StatusBadRequest, schemas.ErrorResponse{Message: "Bad Request"})
 		return
+	}
+
+	// systemsテーブルにシステム名が存在するか確認し存在しなければシステムを追加
+	for _, schemaLog := range schemaLogs {
+		modelSystem, err := crud.FindSystemByName(ctrl.DB, schemaLog.SystemName)
+		if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+			// データベースエラーが発生した場合、500 エラーを返す
+			log.Printf("Error finding system: %v\n", err)
+			c.JSON(http.StatusInternalServerError, schemas.ErrorResponse{Message: "Internal Server Error"})
+			return
+		}
+		if modelSystem == nil {
+			modelSystem = &models.System{Name: schemaLog.SystemName, Category: "Unknown"}
+			if err := crud.InsertSystem(ctrl.DB, modelSystem); err != nil {
+				log.Printf("Error inserting system: %v\n", err)
+				c.JSON(http.StatusInternalServerError, schemas.ErrorResponse{Message: "Internal Server Error"})
+				return
+			}
+			log.Println("Inserted system:", modelSystem.Name)
+		}
 	}
 
 	// schemas.Logをmodels.Logに変換
