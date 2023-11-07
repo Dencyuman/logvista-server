@@ -7,6 +7,8 @@ import (
 	"time"
 
 	"github.com/Dencyuman/logvista-server/src/models"
+	"github.com/Dencyuman/logvista-server/src/schemas"
+
 	"gorm.io/gorm"
 )
 
@@ -117,4 +119,54 @@ func FindLogs(db *gorm.DB, opts *FindLogsOptions) ([]models.Log, error) {
 		return nil, err
 	}
 	return logs, nil
+}
+
+// 指定したシステムの最新のログを取得する
+func FindLatestLog(db *gorm.DB, systemName string) (*models.Log, error) {
+	var log models.Log
+	if err := db.Table("logs").Where("system_name = ?", systemName).Order("timestamp desc").First(&log).Error; err != nil {
+		return nil, err
+	}
+	return &log, nil
+}
+
+// 指定したシステムの指定した時刻から指定した時間前までのログ集計情報を取得する
+func FindSummaryData(
+	db *gorm.DB,
+	system *models.System,
+	timeSpan int,
+	latestTime time.Time,
+) ([]schemas.SummaryData, error) {
+	summaryData := make([]schemas.SummaryData, timeSpan)
+
+	for i := 0; i < timeSpan; i++ {
+		baseTime := latestTime.Add(time.Duration(-i) * time.Hour)
+		endTime := baseTime.Add(time.Hour)
+
+		// 各ログレベルのカウントを取得
+		var infoCount, warningCount, errorCount int64
+		// INFOログカウント
+		db.Model(&models.Log{}).
+			Where("system_name = ? AND level_name = ? AND timestamp >= ? AND timestamp < ?", system.Name, "INFO", baseTime, endTime).
+			Count(&infoCount)
+
+		// WARNINGログカウント
+		db.Model(&models.Log{}).
+			Where("system_name = ? AND level_name = ? AND timestamp >= ? AND timestamp < ?", system.Name, "WARNING", baseTime, endTime).
+			Count(&warningCount)
+
+		// ERRORログカウント
+		db.Model(&models.Log{}).
+			Where("system_name = ? AND level_name = ? AND timestamp >= ? AND timestamp < ?", system.Name, "ERROR", baseTime, endTime).
+			Count(&errorCount)
+
+		summaryData[i] = schemas.SummaryData{
+			BaseTime:        baseTime,
+			InfologCount:    infoCount,
+			WarninglogCount: warningCount,
+			ErrorlogCount:   errorCount,
+		}
+	}
+
+	return summaryData, nil
 }

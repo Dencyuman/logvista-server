@@ -1,13 +1,13 @@
 package database
 
 import (
-	"github.com/google/uuid"
+	"encoding/json"
+	"fmt"
 	"github.com/Dencyuman/logvista-server/src/models"
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 	"math/rand"
 	"time"
-	"fmt"
-	"encoding/json"
 )
 
 // Systemテーブルにシードする
@@ -60,7 +60,6 @@ func seedSystemTable(db *gorm.DB) error {
 	return tx.Commit().Error
 }
 
-
 // generateRandomLogはランダムなログデータを生成する
 func generateRandomLog() *models.Log {
 	// SystemNameの選択肢
@@ -69,7 +68,7 @@ func generateRandomLog() *models.Log {
 	levelNames := []string{"INFO", "WARNING", "ERROR"}
 
 	// 現在時刻から過去24時間のタイムスタンプを生成
-	randomTimestamp := time.Now().Add(-time.Duration(rand.Intn(24)) * time.Hour)
+	randomTimestamp := time.Now().Add(-time.Duration(rand.Intn(6)) * time.Hour)
 
 	// Attributesをマップとして生成
 	randomAttributes := make(map[string]interface{})
@@ -145,12 +144,11 @@ func generateRandomTraceback(logID string, logTimestamp time.Time) *models.Trace
 	return traceback
 }
 
-
 // Logテーブルにシードする
 func seedLogTable(db *gorm.DB) error {
-	// ランダムなログを400件生成
+	// ランダムなログを1000件生成
 	logs := make([]*models.Log, 0)
-	for i := 0; i < 400; i++ {
+	for i := 0; i < 1000; i++ {
 		logs = append(logs, generateRandomLog())
 	}
 
@@ -174,7 +172,6 @@ func seedLogTable(db *gorm.DB) error {
 
 	return tx.Commit().Error
 }
-
 
 // 全てのSeedingを実行する
 func Seed(db *gorm.DB) error {

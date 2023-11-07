@@ -26,7 +26,7 @@ func ConvertSystemModelToResponseSchema(systemModel *models.System) *schemas.Sys
 	}
 
 	systemResponse := &schemas.SystemResponse{
-		ID:        systemModel.ID,
+		ID: systemModel.ID,
 		System: schemas.System{
 			Name:     systemModel.Name,
 			Category: systemModel.Category,

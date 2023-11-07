@@ -74,3 +74,19 @@ type PaginatedLogResponse struct {
 	TotalPages int           `json:"total_pages" example:"10"` // 総ページ数
 	Items      []LogResponse `json:"items"`                    // ログの配列
 }
+
+// swagger:response summary
+type Summary struct {
+	ID string `json:"id" binding:"required" example:"00000000-0000-0000-0000-000000000000"`
+	System
+	LatestLog LogResponse   `json:"latest_log" binding:"required"`
+	Data      []SummaryData `json:"data" binding:"required"`
+}
+
+// swagger:model summaryData
+type SummaryData struct {
+	BaseTime        time.Time `json:"base_time" binding:"required" example:"2023-01-01T00:00:00.000000+09:00"`
+	InfologCount    int64     `json:"infolog_count" binding:"required" example:"10"`
+	WarninglogCount int64     `json:"warninglog_count" binding:"required" example:"10"`
+	ErrorlogCount   int64     `json:"errorlog_count" binding:"required" example:"10"`
+}

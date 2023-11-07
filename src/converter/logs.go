@@ -153,3 +153,24 @@ func ConvertTracebackModelToResponseSchema(tbModel *models.Traceback) *schemas.T
 		},
 	}
 }
+
+// models.Systemとmodels.Log,[]schemas.SummaryDataをschemas.Summaryに変換
+func ConvertSystemModelAndSummaryDataToSchema(
+	systemModel *models.System,
+	summaryData []schemas.SummaryData,
+	latestLog *models.Log,
+) *schemas.Summary {
+	if systemModel == nil || summaryData == nil {
+		return nil
+	}
+
+	return &schemas.Summary{
+		ID: systemModel.ID,
+		System: schemas.System{
+			Name:     systemModel.Name,
+			Category: systemModel.Category,
+		},
+		LatestLog: *ConvertLogModelToResponseSchema(latestLog),
+		Data:      summaryData,
+	}
+}

@@ -1,11 +1,11 @@
 package controller
 
 import (
+	"errors"
+	gorm "gorm.io/gorm"
 	"log"
 	http "net/http"
 	"time"
-	gorm "gorm.io/gorm"
-	"errors"
 
 	converter "github.com/Dencyuman/logvista-server/src/converter"
 	crud "github.com/Dencyuman/logvista-server/src/crud"

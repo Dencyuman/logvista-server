@@ -232,6 +232,48 @@ definitions:
       message:
         type: string
     type: object
+  schemas.Summary:
+    properties:
+      category:
+        example: API Server
+        type: string
+      data:
+        items:
+          $ref: '#/definitions/schemas.SummaryData'
+        type: array
+      id:
+        example: 00000000-0000-0000-0000-000000000000
+        type: string
+      latest_log:
+        $ref: '#/definitions/schemas.LogResponse'
+      name:
+        example: sample_system
+        type: string
+    required:
+    - data
+    - id
+    - latest_log
+    type: object
+  schemas.SummaryData:
+    properties:
+      base_time:
+        example: "2023-01-01T00:00:00.000000+09:00"
+        type: string
+      errorlog_count:
+        example: 10
+        type: integer
+      infolog_count:
+        example: 10
+        type: integer
+      warninglog_count:
+        example: 10
+        type: integer
+    required:
+    - base_time
+    - errorlog_count
+    - infolog_count
+    - warninglog_count
+    type: object
   schemas.SystemResponse:
     properties:
       category:
@@ -289,7 +331,7 @@ info:
   contact: {}
   description: This is LogVista server.
   title: LogVista API
-  version: 0.1.2
+  version: 0.1.3
 paths:
   /healthcheck:
     get:
@@ -491,6 +533,27 @@ paths:
           schema:
             $ref: '#/definitions/schemas.ErrorResponse'
       summary: システム一覧取得
+      tags:
+      - systems
+  /systems/summary:
+    get:
+      consumes:
+      - application/json
+      description: DB上に存在するシステム別集計情報を取得する
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/schemas.Summary'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+      summary: システム集計情報取得
       tags:
       - systems
 swagger: "2.0"

@@ -320,6 +320,38 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/systems/summary": {
+            "get": {
+                "description": "DB上に存在するシステム別集計情報を取得する",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "systems"
+                ],
+                "summary": "システム集計情報取得",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/schemas.Summary"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ErrorResponse"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -637,6 +669,64 @@ const docTemplate = `{
                 }
             }
         },
+        "schemas.Summary": {
+            "type": "object",
+            "required": [
+                "data",
+                "id",
+                "latest_log"
+            ],
+            "properties": {
+                "category": {
+                    "type": "string",
+                    "example": "API Server"
+                },
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/schemas.SummaryData"
+                    }
+                },
+                "id": {
+                    "type": "string",
+                    "example": "00000000-0000-0000-0000-000000000000"
+                },
+                "latest_log": {
+                    "$ref": "#/definitions/schemas.LogResponse"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "sample_system"
+                }
+            }
+        },
+        "schemas.SummaryData": {
+            "type": "object",
+            "required": [
+                "base_time",
+                "errorlog_count",
+                "infolog_count",
+                "warninglog_count"
+            ],
+            "properties": {
+                "base_time": {
+                    "type": "string",
+                    "example": "2023-01-01T00:00:00.000000+09:00"
+                },
+                "errorlog_count": {
+                    "type": "integer",
+                    "example": 10
+                },
+                "infolog_count": {
+                    "type": "integer",
+                    "example": 10
+                },
+                "warninglog_count": {
+                    "type": "integer",
+                    "example": 10
+                }
+            }
+        },
         "schemas.SystemResponse": {
             "type": "object",
             "required": [
@@ -714,7 +804,7 @@ const docTemplate = `{
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
-	Version:          "0.1.2",
+	Version:          "0.1.3",
 	Host:             "127.0.0.1:8080",
 	BasePath:         "/api/v1",
 	Schemes:          []string{},
