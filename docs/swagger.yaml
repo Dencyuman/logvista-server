@@ -5,6 +5,22 @@ definitions:
       message:
         type: string
     type: object
+  schemas.LevelCountResponse:
+    properties:
+      errorlog_count:
+        example: 10
+        type: integer
+      infolog_count:
+        example: 10
+        type: integer
+      warninglog_count:
+        example: 10
+        type: integer
+    required:
+    - errorlog_count
+    - infolog_count
+    - warninglog_count
+    type: object
   schemas.Log:
     properties:
       attributes:
@@ -462,6 +478,10 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/schemas.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
       summary: python-logvista用エンドポイント
       tags:
       - logs
@@ -577,6 +597,37 @@ paths:
           schema:
             $ref: '#/definitions/schemas.ErrorResponse'
       summary: システム更新
+      tags:
+      - systems
+  /systems/{id}/level-counts:
+    get:
+      consumes:
+      - application/json
+      description: 指定したシステムのログレベルの割合を取得する
+      parameters:
+      - description: システムID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/schemas.LevelCountResponse'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+      summary: ログレベル割合一覧取得
       tags:
       - systems
   /systems/summary:

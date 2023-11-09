@@ -22,6 +22,7 @@ import (
 // @Router /logs/python-logvista [post]
 // @Success 200 {object} []schemas.LogResponse
 // @Failure 400 {object} schemas.ErrorResponse
+// @Failure 500 {object} schemas.ErrorResponse
 // @Param logs body []schemas.Log false "ログデータ"
 func (ctrl *AppController) RecordLogs(c *gin.Context) {
 	var schemaLogs []schemas.Log

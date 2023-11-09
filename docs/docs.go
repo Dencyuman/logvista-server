@@ -189,6 +189,12 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/schemas.ErrorResponse"
                         }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ErrorResponse"
+                        }
                     }
                 }
             }
@@ -397,6 +403,53 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/systems/{id}/level-counts": {
+            "get": {
+                "description": "指定したシステムのログレベルの割合を取得する",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "systems"
+                ],
+                "summary": "ログレベル割合一覧取得",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "システムID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/schemas.LevelCountResponse"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ErrorResponse"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -405,6 +458,28 @@ const docTemplate = `{
             "properties": {
                 "message": {
                     "type": "string"
+                }
+            }
+        },
+        "schemas.LevelCountResponse": {
+            "type": "object",
+            "required": [
+                "errorlog_count",
+                "infolog_count",
+                "warninglog_count"
+            ],
+            "properties": {
+                "errorlog_count": {
+                    "type": "integer",
+                    "example": 10
+                },
+                "infolog_count": {
+                    "type": "integer",
+                    "example": 10
+                },
+                "warninglog_count": {
+                    "type": "integer",
+                    "example": 10
                 }
             }
         },
