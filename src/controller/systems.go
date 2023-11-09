@@ -81,21 +81,21 @@ func (ctrl *AppController) GetSystemSummary(c *gin.Context) {
 
 	now := time.Now()
 	var roundedTime time.Time
-	if timeSpan >= 60 {
-		// timeSpanが60秒以上の場合は分または時を繰り上げる
-		roundedMinute := now.Minute() + timeSpan/60 - now.Minute()%(timeSpan/60)
-		if roundedMinute >= 60 {
-			roundedMinute = 0
-			now = now.Add(time.Hour)
-		}
+	if timeSpan >= 3600 {
+		// timeSpanが3600秒以上の場合は時間を切り捨てる
+		roundedHour := now.Hour() - now.Hour()%(timeSpan/3600)
+		roundedTime = time.Date(now.Year(), now.Month(), now.Day(), roundedHour, 0, 0, 0, now.Location())
+	} else if timeSpan >= 60 {
+		// timeSpanが60秒以上、3600秒未満の場合は分を切り捨てる
+		roundedMinute := now.Minute() - now.Minute()%(timeSpan/60)
 		roundedTime = time.Date(now.Year(), now.Month(), now.Day(), now.Hour(), roundedMinute, 0, 0, now.Location())
 	} else {
-		// timeSpanが60秒未満の場合は秒を繰り上げる
-		extraSeconds := timeSpan - now.Second()%timeSpan
-		if now.Second()%timeSpan == 0 { // 既にtimeSpanの倍数の秒数の場合は繰り上げない
-			extraSeconds = 0
-		}
-		roundedTime = now.Add(time.Duration(extraSeconds) * time.Second)
+		// timeSpanが60秒未満の場合は秒を切り捨てる
+		extraSeconds := now.Second() % timeSpan
+		roundedTime = now.Add(time.Duration(-extraSeconds) * time.Second)
+		// 秒以下を切り捨てるために、roundedTimeの秒をtimeSpanで割った商にtimeSpanを掛けたものに設定する
+		roundedTime = time.Date(roundedTime.Year(), roundedTime.Month(), roundedTime.Day(),
+			roundedTime.Hour(), roundedTime.Minute(), roundedTime.Second()/timeSpan*timeSpan, 0, roundedTime.Location())
 	}
 
 	var Summaries []schemas.Summary
