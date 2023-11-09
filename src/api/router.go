@@ -41,7 +41,6 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 			systemsGroup.GET("/", appController.GetSystems)
 			systemsGroup.GET("/summary", appController.GetSystemSummary)
 			systemsGroup.PUT("/", appController.UpdateSystem)
-			logsGroup.GET("/:id/level-counts", appController.GetLevelCounts)
 		}
 	}
 

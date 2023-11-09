@@ -36,10 +36,3 @@ type SummaryData struct {
 	WarninglogCount int64     `json:"warninglog_count" binding:"required" example:"10"`
 	ErrorlogCount   int64     `json:"errorlog_count" binding:"required" example:"10"`
 }
-
-// swagger:response levelCountResponse
-type LevelCountResponse struct {
-	InfologCount    int64 `json:"infolog_count" binding:"required" example:"10"`
-	WarninglogCount int64 `json:"warninglog_count" binding:"required" example:"10"`
-	ErrorlogCount   int64 `json:"errorlog_count" binding:"required" example:"10"`
-}

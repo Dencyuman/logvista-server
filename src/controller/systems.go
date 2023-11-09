@@ -140,15 +140,3 @@ func (ctrl *AppController) UpdateSystem(c *gin.Context) {
 
 	c.JSON(http.StatusOK, "OK")
 }
-
-// @Summary ログレベル割合一覧取得
-// @Description 指定したシステムのログレベルの割合を取得する
-// @Tags systems
-// @Accept json
-// @Produce json
-// @Router /systems/{id}/level-counts [get]
-// @Param id path string true "システムID"
-// @Success 200 {object} []schemas.LevelCountResponse
-// @Failure 400 {object} schemas.ErrorResponse
-// @Failure 500 {object} schemas.ErrorResponse
-func (ctrl *AppController) GetLevelCounts(c *gin.Context) {}
