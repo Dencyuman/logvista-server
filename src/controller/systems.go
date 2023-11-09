@@ -4,10 +4,12 @@ import (
 	"log"
 	http "net/http"
 	"sort"
+	"strconv"
 	"time"
 
 	"github.com/Dencyuman/logvista-server/src/converter"
 	crud "github.com/Dencyuman/logvista-server/src/crud"
+	models "github.com/Dencyuman/logvista-server/src/models"
 	schemas "github.com/Dencyuman/logvista-server/src/schemas"
 	gin "github.com/gin-gonic/gin"
 )
@@ -52,21 +54,75 @@ func (ctrl *AppController) GetSystems(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Router /systems/summary [get]
+// @Param id query string false "システムID：指定しない場合は全てのシステムを取得"
+// @Param timeSpan query int false "集計時間スパン（秒）: 10秒刻みで指定可能" minimum(10) default(3600)
+// @Param dataCount query int false "取得データ個数" minimum(1) default(12)
 // @Success 200 {object} []schemas.Summary
+// @Failure 400 {object} schemas.ErrorResponse
 // @Failure 500 {object} schemas.ErrorResponse
 func (ctrl *AppController) GetSystemSummary(c *gin.Context) {
-	modelsSystems, err := crud.FindAllSystems(ctrl.DB)
+	timeSpanParam := c.DefaultQuery("timeSpan", "3600") // デフォルトを1時間とする
+	systemID := c.Query("id")                           // オプショナルのシステムID
+	dataCountParam := c.DefaultQuery("dataCount", "12") // デフォルトを12個とする
+	timeSpan, err := strconv.Atoi(timeSpanParam)
 	if err != nil {
-		log.Printf("Error finding systems: %v\n", err)
-		c.JSON(http.StatusInternalServerError, schemas.ErrorResponse{Message: "Internal Server Error"})
+		c.JSON(http.StatusBadRequest, schemas.ErrorResponse{Message: "Invalid timeSpan parameter"})
+		return
+	}
+	if timeSpan < 10 {
+		c.JSON(http.StatusBadRequest, schemas.ErrorResponse{Message: "timeSpan must be at least 10 seconds"})
+		return
+	}
+	dataCount, err := strconv.Atoi(dataCountParam)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, schemas.ErrorResponse{Message: "Invalid dataCount parameter"})
 		return
 	}
 
-	var Summaries []schemas.Summary
 	now := time.Now()
-	roundedTime := time.Date(now.Year(), now.Month(), now.Day(), now.Hour(), 0, 0, 0, now.Location())
+	var roundedTime time.Time
+	if timeSpan >= 60 {
+		// timeSpanが60秒以上の場合は分または時を繰り上げる
+		roundedMinute := now.Minute() + timeSpan/60 - now.Minute()%(timeSpan/60)
+		if roundedMinute >= 60 {
+			roundedMinute = 0
+			now = now.Add(time.Hour)
+		}
+		roundedTime = time.Date(now.Year(), now.Month(), now.Day(), now.Hour(), roundedMinute, 0, 0, now.Location())
+	} else {
+		// timeSpanが60秒未満の場合は秒を繰り上げる
+		extraSeconds := timeSpan - now.Second()%timeSpan
+		if now.Second()%timeSpan == 0 { // 既にtimeSpanの倍数の秒数の場合は繰り上げない
+			extraSeconds = 0
+		}
+		roundedTime = now.Add(time.Duration(extraSeconds) * time.Second)
+	}
+
+	var Summaries []schemas.Summary
+	var modelsSystems []models.System
+	if systemID != "" {
+		log.Printf("システム指定")
+		system, err := crud.FindSystemByID(ctrl.DB, systemID)
+		if err != nil {
+			log.Printf("Error finding system by ID: %v\n", err)
+			c.JSON(http.StatusInternalServerError, schemas.ErrorResponse{Message: "Internal Server Error"})
+			return
+		}
+		// appendを使用してスライスに追加する際は、ポインタの指す値を使用する
+		modelsSystems = append(modelsSystems, *system) // ポインタをデリファレンスして値を取得
+	} else {
+		log.Printf("システム未指定")
+		// システムIDが指定されていない場合は全てのシステムを取得
+		modelsSystems, err = crud.FindAllSystems(ctrl.DB)
+		if err != nil {
+			log.Printf("Error finding systems: %v\n", err)
+			c.JSON(http.StatusInternalServerError, schemas.ErrorResponse{Message: "Internal Server Error"})
+			return
+		}
+	}
+
 	for _, modelsSystem := range modelsSystems {
-		summaryData, err := crud.FindSummaryData(ctrl.DB, &modelsSystem, 12, roundedTime)
+		summaryData, err := crud.FindSummaryData(ctrl.DB, &modelsSystem, timeSpan, roundedTime, dataCount)
 		if err != nil {
 			log.Printf("Error finding summary data: %v\n", err)
 			c.JSON(http.StatusInternalServerError, schemas.ErrorResponse{Message: "Internal Server Error"})
@@ -86,7 +142,6 @@ func (ctrl *AppController) GetSystemSummary(c *gin.Context) {
 		Summaries = append(Summaries, *summary)
 	}
 
-	// Summaries を CreatedAt フィールドでソートする
 	sort.Slice(Summaries, func(i, j int) bool {
 		return Summaries[i].CreatedAt.Before(Summaries[j].CreatedAt)
 	})

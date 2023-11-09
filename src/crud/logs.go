@@ -130,42 +130,53 @@ func FindLatestLog(db *gorm.DB, systemName string) (*models.Log, error) {
 	return &log, nil
 }
 
-// 指定したシステムの指定した時刻から指定した時間前までのログ集計情報を取得する
 func FindSummaryData(
 	db *gorm.DB,
 	system *models.System,
 	timeSpan int,
 	latestTime time.Time,
+	dataCount int, // 追加のパラメータ
 ) ([]schemas.SummaryData, error) {
-	summaryData := make([]schemas.SummaryData, timeSpan)
+	summaryData := make([]schemas.SummaryData, 0, dataCount)
 
-	for i := 0; i < timeSpan; i++ {
-		baseTime := latestTime.Add(time.Duration(-i) * time.Hour)
-		endTime := baseTime.Add(time.Hour)
+	for i := 0; i < dataCount; i++ {
+		// latestTimeからtimeSpan * dataCount秒前の時間を計算して、そこから集計を開始します。
+		baseTime := latestTime.Add(time.Duration(-i*timeSpan) * time.Second)
+		endTime := baseTime.Add(time.Duration(timeSpan) * time.Second)
 
 		// 各ログレベルのカウントを取得
 		var infoCount, warningCount, errorCount int64
 		// INFOログカウント
-		db.Model(&models.Log{}).
+		err := db.Model(&models.Log{}).
 			Where("system_name = ? AND level_name = ? AND timestamp >= ? AND timestamp < ?", system.Name, "INFO", baseTime, endTime).
-			Count(&infoCount)
+			Count(&infoCount).Error
+		if err != nil {
+			return nil, err
+		}
 
 		// WARNINGログカウント
-		db.Model(&models.Log{}).
+		err = db.Model(&models.Log{}).
 			Where("system_name = ? AND level_name = ? AND timestamp >= ? AND timestamp < ?", system.Name, "WARNING", baseTime, endTime).
-			Count(&warningCount)
+			Count(&warningCount).Error
+		if err != nil {
+			return nil, err
+		}
 
 		// ERRORログカウント
-		db.Model(&models.Log{}).
+		err = db.Model(&models.Log{}).
 			Where("system_name = ? AND level_name = ? AND timestamp >= ? AND timestamp < ?", system.Name, "ERROR", baseTime, endTime).
-			Count(&errorCount)
+			Count(&errorCount).Error
+		if err != nil {
+			return nil, err
+		}
 
-		summaryData[i] = schemas.SummaryData{
+		// 計算した時間範囲のデータを追加
+		summaryData = append(summaryData, schemas.SummaryData{
 			BaseTime:        baseTime,
 			InfologCount:    infoCount,
 			WarninglogCount: warningCount,
 			ErrorlogCount:   errorCount,
-		}
+		})
 	}
 
 	return summaryData, nil
