@@ -319,6 +319,51 @@ const docTemplate = `{
                         }
                     }
                 }
+            },
+            "put": {
+                "description": "DB上に存在するシステムを更新する",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "systems"
+                ],
+                "summary": "システム更新",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "システムID",
+                        "name": "ID",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "description": "Update System Request",
+                        "name": "system",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/schemas.SystemRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ErrorResponse"
+                        }
+                    }
+                }
             }
         },
         "/systems/summary": {
@@ -672,14 +717,20 @@ const docTemplate = `{
         "schemas.Summary": {
             "type": "object",
             "required": [
+                "created_at",
                 "data",
                 "id",
-                "latest_log"
+                "latest_log",
+                "updated_at"
             ],
             "properties": {
                 "category": {
                     "type": "string",
                     "example": "API Server"
+                },
+                "created_at": {
+                    "type": "string",
+                    "example": "2023-01-01T00:00:00.000000+09:00"
                 },
                 "data": {
                     "type": "array",
@@ -697,6 +748,10 @@ const docTemplate = `{
                 "name": {
                     "type": "string",
                     "example": "sample_system"
+                },
+                "updated_at": {
+                    "type": "string",
+                    "example": "2023-01-01T00:00:00.000000+09:00"
                 }
             }
         },
@@ -724,6 +779,15 @@ const docTemplate = `{
                 "warninglog_count": {
                     "type": "integer",
                     "example": 10
+                }
+            }
+        },
+        "schemas.SystemRequest": {
+            "type": "object",
+            "properties": {
+                "category": {
+                    "type": "string",
+                    "example": "API Server"
                 }
             }
         },
@@ -804,7 +868,7 @@ const docTemplate = `{
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
-	Version:          "0.1.4",
+	Version:          "0.1.5",
 	Host:             "127.0.0.1:8080",
 	BasePath:         "/api/v1",
 	Schemes:          []string{},

@@ -3,6 +3,7 @@ package controller
 import (
 	"log"
 	http "net/http"
+	"sort"
 	"time"
 
 	"github.com/Dencyuman/logvista-server/src/converter"
@@ -37,6 +38,11 @@ func (ctrl *AppController) GetSystems(c *gin.Context) {
 		systemResponses = append(systemResponses, *systemResponse)
 	}
 
+	// systemResponses を CreatedAt フィールドでソートする
+	sort.Slice(systemResponses, func(i, j int) bool {
+		return systemResponses[i].CreatedAt.Before(systemResponses[j].CreatedAt)
+	})
+
 	c.JSON(http.StatusOK, systemResponses)
 }
 
@@ -58,8 +64,9 @@ func (ctrl *AppController) GetSystemSummary(c *gin.Context) {
 
 	var Summaries []schemas.Summary
 	now := time.Now()
+	roundedTime := time.Date(now.Year(), now.Month(), now.Day(), now.Hour(), 0, 0, 0, now.Location())
 	for _, modelsSystem := range modelsSystems {
-		summaryData, err := crud.FindSummaryData(ctrl.DB, &modelsSystem, 12, now)
+		summaryData, err := crud.FindSummaryData(ctrl.DB, &modelsSystem, 12, roundedTime)
 		if err != nil {
 			log.Printf("Error finding summary data: %v\n", err)
 			c.JSON(http.StatusInternalServerError, schemas.ErrorResponse{Message: "Internal Server Error"})
@@ -79,5 +86,57 @@ func (ctrl *AppController) GetSystemSummary(c *gin.Context) {
 		Summaries = append(Summaries, *summary)
 	}
 
+	// Summaries を CreatedAt フィールドでソートする
+	sort.Slice(Summaries, func(i, j int) bool {
+		return Summaries[i].CreatedAt.Before(Summaries[j].CreatedAt)
+	})
+
 	c.JSON(http.StatusOK, Summaries)
+}
+
+// @Summary システム更新
+// @Description DB上に存在するシステムを更新する
+// @Tags systems
+// @Accept json
+// @Produce json
+// @Router /systems/ [put]
+// @Param ID query string true "システムID"
+// @Param system body schemas.SystemRequest true "Update System Request"
+// @Success 200 {string} string "OK"
+// @Failure 400 {object} schemas.ErrorResponse
+func (ctrl *AppController) UpdateSystem(c *gin.Context) {
+	// クエリパラメータからIDを取得する
+	systemID := c.Query("ID")
+
+	// IDが提供されていない場合は、エラーメッセージを返す
+	if systemID == "" {
+		c.JSON(http.StatusBadRequest, schemas.ErrorResponse{Message: "System ID is required"})
+		return
+	}
+
+	var systemRequest schemas.SystemRequest
+	if err := c.ShouldBindJSON(&systemRequest); err != nil {
+		log.Printf("Error binding system request: %v\n", err)
+		c.JSON(http.StatusBadRequest, schemas.ErrorResponse{Message: "Bad Request"})
+		return
+	}
+
+	// クエリパラメータから取得したIDを使用してシステムを見つける
+	modelsSystem, err := crud.FindSystemByID(ctrl.DB, systemID)
+	if err != nil {
+		log.Printf("Error finding system by id: %v\n", err)
+		c.JSON(http.StatusInternalServerError, schemas.ErrorResponse{Message: "Internal Server Error"})
+		return
+	}
+
+	// JSONリクエストボディから受け取ったデータでシステムを更新する
+	modelsSystem.Category = systemRequest.Category
+	modelsSystem.UpdatedAt = time.Now()
+	if err := crud.UpdateSystem(ctrl.DB, modelsSystem); err != nil {
+		log.Printf("Error updating system: %v\n", err)
+		c.JSON(http.StatusInternalServerError, schemas.ErrorResponse{Message: "Internal Server Error"})
+		return
+	}
+
+	c.JSON(http.StatusOK, "OK")
 }

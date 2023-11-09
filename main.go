@@ -9,7 +9,7 @@ import (
 )
 
 // @title LogVista API
-// @version 0.1.4
+// @version 0.1.5
 // @description This is LogVista server.
 // @host 127.0.0.1:8080
 // @BasePath /api/v1

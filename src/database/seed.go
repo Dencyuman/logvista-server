@@ -68,7 +68,7 @@ func generateRandomLog() *models.Log {
 	levelNames := []string{"INFO", "WARNING", "ERROR"}
 
 	// 現在時刻から過去24時間のタイムスタンプを生成
-	randomTimestamp := time.Now().Add(-time.Duration(rand.Intn(6)) * time.Hour)
+	randomTimestamp := time.Now().Add(-time.Duration(rand.Intn(12)) * time.Hour)
 
 	// Attributesをマップとして生成
 	randomAttributes := make(map[string]interface{})

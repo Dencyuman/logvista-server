@@ -34,6 +34,34 @@ func InsertSystem(db *gorm.DB, modelSystem *models.System) error {
 	return tx.Commit().Error // トランザクションをコミット
 }
 
+// Systemデータをデータベースに更新する
+func UpdateSystem(db *gorm.DB, modelSystem *models.System) error {
+	if modelSystem == nil {
+		return errors.New("received nil system data")
+	}
+
+	// Begin a new transaction.
+	tx := db.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	if err := tx.Error; err != nil {
+		return err
+	}
+
+	// Update the modelSystem. Assuming you want to update all fields except primary key.
+	if err := tx.Model(modelSystem).Updates(modelSystem).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	// If no error, commit the transaction.
+	return tx.Commit().Error
+}
+
 // Systemデータを全件取得する
 func FindAllSystems(db *gorm.DB) ([]models.System, error) {
 	var systems []models.System
@@ -47,6 +75,15 @@ func FindAllSystems(db *gorm.DB) ([]models.System, error) {
 func FindSystemByName(db *gorm.DB, name string) (*models.System, error) {
 	var system models.System
 	if err := db.Where("name = ?", name).First(&system).Error; err != nil {
+		return nil, err
+	}
+	return &system, nil
+}
+
+// SystemデータをIDで検索する
+func FindSystemByID(db *gorm.DB, id string) (*models.System, error) {
+	var system models.System
+	if err := db.Where("id = ?", id).First(&system).Error; err != nil {
 		return nil, err
 	}
 	return &system, nil

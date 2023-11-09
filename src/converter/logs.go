@@ -165,10 +165,14 @@ func ConvertSystemModelAndSummaryDataToSchema(
 	}
 
 	return &schemas.Summary{
-		ID: systemModel.ID,
-		System: schemas.System{
-			Name:     systemModel.Name,
-			Category: systemModel.Category,
+		SystemResponse: schemas.SystemResponse{
+			ID: systemModel.ID,
+			System: schemas.System{
+				Name:     systemModel.Name,
+				Category: systemModel.Category,
+			},
+			CreatedAt: systemModel.CreatedAt,
+			UpdatedAt: systemModel.UpdatedAt,
 		},
 		LatestLog: *ConvertLogModelToResponseSchema(latestLog),
 		Data:      summaryData,

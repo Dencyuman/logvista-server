@@ -237,6 +237,9 @@ definitions:
       category:
         example: API Server
         type: string
+      created_at:
+        example: "2023-01-01T00:00:00.000000+09:00"
+        type: string
       data:
         items:
           $ref: '#/definitions/schemas.SummaryData'
@@ -249,10 +252,15 @@ definitions:
       name:
         example: sample_system
         type: string
+      updated_at:
+        example: "2023-01-01T00:00:00.000000+09:00"
+        type: string
     required:
+    - created_at
     - data
     - id
     - latest_log
+    - updated_at
     type: object
   schemas.SummaryData:
     properties:
@@ -273,6 +281,12 @@ definitions:
     - errorlog_count
     - infolog_count
     - warninglog_count
+    type: object
+  schemas.SystemRequest:
+    properties:
+      category:
+        example: API Server
+        type: string
     type: object
   schemas.SystemResponse:
     properties:
@@ -331,7 +345,7 @@ info:
   contact: {}
   description: This is LogVista server.
   title: LogVista API
-  version: 0.1.4
+  version: 0.1.5
 paths:
   /healthcheck:
     get:
@@ -533,6 +547,36 @@ paths:
           schema:
             $ref: '#/definitions/schemas.ErrorResponse'
       summary: システム一覧取得
+      tags:
+      - systems
+    put:
+      consumes:
+      - application/json
+      description: DB上に存在するシステムを更新する
+      parameters:
+      - description: システムID
+        in: query
+        name: ID
+        required: true
+        type: string
+      - description: Update System Request
+        in: body
+        name: system
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.SystemRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+      summary: システム更新
       tags:
       - systems
   /systems/summary:
