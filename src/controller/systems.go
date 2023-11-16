@@ -101,7 +101,6 @@ func (ctrl *AppController) GetSystemSummary(c *gin.Context) {
 	var Summaries []schemas.Summary
 	var modelsSystems []models.System
 	if systemID != "" {
-		log.Printf("システム指定")
 		system, err := crud.FindSystemByID(ctrl.DB, systemID)
 		if err != nil {
 			log.Printf("Error finding system by ID: %v\n", err)
@@ -111,7 +110,6 @@ func (ctrl *AppController) GetSystemSummary(c *gin.Context) {
 		// appendを使用してスライスに追加する際は、ポインタの指す値を使用する
 		modelsSystems = append(modelsSystems, *system) // ポインタをデリファレンスして値を取得
 	} else {
-		log.Printf("システム未指定")
 		// システムIDが指定されていない場合は全てのシステムを取得
 		modelsSystems, err = crud.FindAllSystems(ctrl.DB)
 		if err != nil {

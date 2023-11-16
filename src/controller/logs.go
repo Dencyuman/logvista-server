@@ -96,7 +96,7 @@ type getLogsParams struct {
 // @Accept json
 // @Produce json
 // @Router /logs/ [get]
-// @Success 200 {array} schemas.PaginatedLogResponse
+// @Success 200 {object} schemas.PaginatedLogResponse
 // @Failure 400 {object} schemas.ErrorResponse
 // @Failure 500 {object} schemas.ErrorResponse
 // @Param page query int false "現在のページ" default(1) minimum(1)

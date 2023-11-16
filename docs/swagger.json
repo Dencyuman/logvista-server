@@ -121,10 +121,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/schemas.PaginatedLogResponse"
-                            }
+                            "$ref": "#/definitions/schemas.PaginatedLogResponse"
                         }
                     },
                     "400": {

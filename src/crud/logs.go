@@ -124,7 +124,7 @@ func FindLogs(db *gorm.DB, opts *FindLogsOptions) ([]models.Log, error) {
 // 指定したシステムの最新のログを取得する
 func FindLatestLog(db *gorm.DB, systemName string) (*models.Log, error) {
 	var log models.Log
-	if err := db.Table("logs").Where("system_name = ?", systemName).Order("timestamp desc").First(&log).Error; err != nil {
+	if err := db.Table("logs").Preload("ExcTraceback").Where("system_name = ?", systemName).Order("timestamp desc").First(&log).Error; err != nil {
 		return nil, err
 	}
 	return &log, nil

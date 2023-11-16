@@ -422,9 +422,7 @@ paths:
         "200":
           description: OK
           schema:
-            items:
-              $ref: '#/definitions/schemas.PaginatedLogResponse'
-            type: array
+            $ref: '#/definitions/schemas.PaginatedLogResponse'
         "400":
           description: Bad Request
           schema:
