@@ -8,7 +8,8 @@ import (
 
 type Log struct {
 	ID              string      `gorm:"type:uuid;primaryKey" json:"id"`
-	SystemName      string      `json:"system_name"`
+	SystemID        string      `gorm:"type:uuid;index" json:"system_id"`
+	System          System      `gorm:"foreignKey:SystemID" json:"system"`
 	CPUPercent      float64     `json:"cpu_percent"`
 	ExcType         string      `json:"exc_type"`
 	ExcValue        string      `json:"exc_value"`

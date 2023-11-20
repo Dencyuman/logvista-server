@@ -34,7 +34,7 @@ func (ctrl *AppController) RecordLogs(c *gin.Context) {
 
 	// systemsテーブルにシステム名が存在するか確認し存在しなければシステムを追加
 	for _, schemaLog := range schemaLogs {
-		modelSystem, err := crud.FindSystemByName(ctrl.DB, schemaLog.SystemName)
+		modelSystem, err := crud.FindSystemByName(ctrl.DB, schemaLog.System.Name)
 		if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 			// データベースエラーが発生した場合、500 エラーを返す
 			log.Printf("Error finding system: %v\n", err)
@@ -42,7 +42,7 @@ func (ctrl *AppController) RecordLogs(c *gin.Context) {
 			return
 		}
 		if modelSystem == nil {
-			modelSystem = &models.System{Name: schemaLog.SystemName, Category: "Unknown"}
+			modelSystem = &models.System{Name: schemaLog.System.Name, Category: "Unknown"}
 			if err := crud.InsertSystem(ctrl.DB, modelSystem); err != nil {
 				log.Printf("Error inserting system: %v\n", err)
 				c.JSON(http.StatusInternalServerError, schemas.ErrorResponse{Message: "Internal Server Error"})

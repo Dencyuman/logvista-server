@@ -61,9 +61,7 @@ func seedSystemTable(db *gorm.DB) error {
 }
 
 // generateRandomLogはランダムなログデータを生成する
-func generateRandomLog() *models.Log {
-	// SystemNameの選択肢
-	systemNames := []string{"systemA", "systemB", "systemC", "systemD", "systemE", "systemF"}
+func generateRandomLog(systemIDs []string) *models.Log {
 	// LevelNameの選択肢
 	levelNames := []string{"INFO", "WARNING", "ERROR"}
 
@@ -87,7 +85,7 @@ func generateRandomLog() *models.Log {
 	// Logオブジェクトを生成
 	log := &models.Log{
 		ID:              uuid.New().String(),
-		SystemName:      systemNames[rand.Intn(len(systemNames))],
+		SystemID:        systemIDs[rand.Intn(len(systemIDs))],
 		CPUPercent:      rand.Float64() * 100,
 		ExcType:         "ExceptionType",
 		ExcValue:        "ExceptionValue",
@@ -144,12 +142,31 @@ func generateRandomTraceback(logID string, logTimestamp time.Time) *models.Trace
 	return traceback
 }
 
+// getAllSystemIDsは全てのSystemIDを取得する
+func getAllSystemIDs(db *gorm.DB) ([]string, error) {
+	var systems []models.System
+	if err := db.Find(&systems).Error; err != nil {
+		return nil, err
+	}
+
+	var systemIDs []string
+	for _, system := range systems {
+		systemIDs = append(systemIDs, system.ID)
+	}
+
+	return systemIDs, nil
+}
+
 // Logテーブルにシードする
 func seedLogTable(db *gorm.DB) error {
-	// ランダムなログを1000件生成
+	systemIDs, err := getAllSystemIDs(db)
+	if err != nil {
+		return err
+	}
+
 	logs := make([]*models.Log, 0)
 	for i := 0; i < 1000; i++ {
-		logs = append(logs, generateRandomLog())
+		logs = append(logs, generateRandomLog(systemIDs))
 	}
 
 	tx := db.Begin()

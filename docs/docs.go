@@ -446,6 +446,7 @@ const docTemplate = `{
             "required": [
                 "id",
                 "level_name",
+                "system",
                 "timestamp"
             ],
             "properties": {
@@ -543,9 +544,8 @@ const docTemplate = `{
                     "type": "string",
                     "example": "MainProcess"
                 },
-                "system_name": {
-                    "type": "string",
-                    "example": "sample_system"
+                "system": {
+                    "$ref": "#/definitions/schemas.SystemResponse"
                 },
                 "thread": {
                     "type": "integer",
@@ -575,6 +575,7 @@ const docTemplate = `{
                 "created_at",
                 "id",
                 "level_name",
+                "system",
                 "timestamp",
                 "updated_at"
             ],
@@ -677,9 +678,8 @@ const docTemplate = `{
                     "type": "string",
                     "example": "MainProcess"
                 },
-                "system_name": {
-                    "type": "string",
-                    "example": "sample_system"
+                "system": {
+                    "$ref": "#/definitions/schemas.SystemResponse"
                 },
                 "thread": {
                     "type": "integer",

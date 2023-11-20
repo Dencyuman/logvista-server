@@ -68,7 +68,7 @@ func FindLogs(db *gorm.DB, opts *FindLogsOptions) ([]models.Log, error) {
 		opts = &FindLogsOptions{}
 	}
 
-	query := db.Table("logs").Preload("ExcTraceback")
+	query := db.Table("logs").Preload("System").Preload("ExcTraceback")
 
 	if opts.Limit != nil {
 		query = query.Limit(*opts.Limit)
@@ -90,9 +90,10 @@ func FindLogs(db *gorm.DB, opts *FindLogsOptions) ([]models.Log, error) {
 		query = query.Where("level_name = ?", *opts.LevelName)
 	}
 
-	if opts.SystemName != nil {
-		query = query.Where("system_name = ?", *opts.SystemName)
-	}
+    if opts.SystemName != nil {
+        query = query.Joins("JOIN systems ON systems.id = logs.system_id").
+            Where("systems.name = ?", *opts.SystemName)
+    }
 
 	if opts.ContainsMsg != nil {
 		query = query.Where("message LIKE ?", "%"+*opts.ContainsMsg+"%")

@@ -77,9 +77,8 @@ definitions:
       process_name:
         example: MainProcess
         type: string
-      system_name:
-        example: sample_system
-        type: string
+      system:
+        $ref: '#/definitions/schemas.SystemResponse'
       thread:
         example: 10000
         type: integer
@@ -98,6 +97,7 @@ definitions:
     required:
     - id
     - level_name
+    - system
     - timestamp
     type: object
   schemas.LogResponse:
@@ -175,9 +175,8 @@ definitions:
       process_name:
         example: MainProcess
         type: string
-      system_name:
-        example: sample_system
-        type: string
+      system:
+        $ref: '#/definitions/schemas.SystemResponse'
       thread:
         example: 10000
         type: integer
@@ -200,6 +199,7 @@ definitions:
     - created_at
     - id
     - level_name
+    - system
     - timestamp
     - updated_at
     type: object

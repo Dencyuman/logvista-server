@@ -15,7 +15,7 @@ type FlexibleLog struct {
 // swagger:request log
 type Log struct {
 	ID              string                 `json:"id" binding:"required" example:"00000000-0000-0000-0000-000000000000"`
-	SystemName      string                 `json:"system_name" example:"sample_system"`
+	System          SystemResponse         `json:"system" binding:"required"`
 	CPUPercent      float64                `json:"cpu_percent" example:"0.0"`
 	ExcType         string                 `json:"exc_type" example:"Exception"`
 	ExcValue        string                 `json:"exc_value" example:"sample"`
