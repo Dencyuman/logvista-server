@@ -56,6 +56,7 @@ type Traceback struct {
 // swagger:response logResponse
 type LogResponse struct {
 	Log
+	System       SystemResponse      `json:"system" binding:"required"`
 	CreatedAt    time.Time           `json:"created_at" binding:"required" example:"2023-01-01T00:00:00.000000+09:00"`
 	UpdatedAt    time.Time           `json:"updated_at" binding:"required" example:"2023-01-01T00:00:00.000000+09:00"`
 	ExcTraceback []TracebackResponse `json:"exc_traceback"`

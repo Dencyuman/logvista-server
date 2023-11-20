@@ -54,7 +54,7 @@ func (ctrl *AppController) GetSystems(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Router /systems/summary [get]
-// @Param id query string false "システムID：指定しない場合は全てのシステムを取得"
+// @Param systemName query string false "システム名：指定しない場合は全てのシステムを取得"
 // @Param timeSpan query int false "集計時間スパン（秒）: 10秒刻みで指定可能" minimum(10) default(3600)
 // @Param dataCount query int false "取得データ個数" minimum(1) default(12)
 // @Success 200 {object} []schemas.Summary
@@ -62,7 +62,7 @@ func (ctrl *AppController) GetSystems(c *gin.Context) {
 // @Failure 500 {object} schemas.ErrorResponse
 func (ctrl *AppController) GetSystemSummary(c *gin.Context) {
 	timeSpanParam := c.DefaultQuery("timeSpan", "3600") // デフォルトを1時間とする
-	systemID := c.Query("id")                           // オプショナルのシステムID
+	systemName := c.Query("systemName")                 // オプショナルのシステム名
 	dataCountParam := c.DefaultQuery("dataCount", "12") // デフォルトを12個とする
 	timeSpan, err := strconv.Atoi(timeSpanParam)
 	if err != nil {
@@ -100,8 +100,8 @@ func (ctrl *AppController) GetSystemSummary(c *gin.Context) {
 
 	var Summaries []schemas.Summary
 	var modelsSystems []models.System
-	if systemID != "" {
-		system, err := crud.FindSystemByID(ctrl.DB, systemID)
+	if systemName != "" {
+		system, err := crud.FindSystemByName(ctrl.DB, systemName)
 		if err != nil {
 			log.Printf("Error finding system by ID: %v\n", err)
 			c.JSON(http.StatusInternalServerError, schemas.ErrorResponse{Message: "Internal Server Error"})
@@ -152,17 +152,17 @@ func (ctrl *AppController) GetSystemSummary(c *gin.Context) {
 // @Tags systems
 // @Accept json
 // @Produce json
-// @Router /systems/ [put]
-// @Param ID query string true "システムID"
+// @Router /systems/{systemName} [put]
+// @Param systemName path string true "システム名"
 // @Param system body schemas.SystemRequest true "Update System Request"
 // @Success 200 {string} string "OK"
 // @Failure 400 {object} schemas.ErrorResponse
 func (ctrl *AppController) UpdateSystem(c *gin.Context) {
-	// クエリパラメータからIDを取得する
-	systemID := c.Query("ID")
+	// パスパラメータからIDを取得する
+	systemName := c.Param("systemName")
 
 	// IDが提供されていない場合は、エラーメッセージを返す
-	if systemID == "" {
+	if systemName == "" {
 		c.JSON(http.StatusBadRequest, schemas.ErrorResponse{Message: "System ID is required"})
 		return
 	}
@@ -174,8 +174,8 @@ func (ctrl *AppController) UpdateSystem(c *gin.Context) {
 		return
 	}
 
-	// クエリパラメータから取得したIDを使用してシステムを見つける
-	modelsSystem, err := crud.FindSystemByID(ctrl.DB, systemID)
+	// パスパラメータから取得したIDを使用してシステムを見つける
+	modelsSystem, err := crud.FindSystemByName(ctrl.DB, systemName)
 	if err != nil {
 		log.Printf("Error finding system by id: %v\n", err)
 		c.JSON(http.StatusInternalServerError, schemas.ErrorResponse{Message: "Internal Server Error"})

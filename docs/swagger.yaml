@@ -175,6 +175,8 @@ definitions:
       process_name:
         example: MainProcess
         type: string
+      system:
+        $ref: '#/definitions/schemas.SystemResponse'
       system_name:
         example: sample_system
         type: string
@@ -200,6 +202,7 @@ definitions:
     - created_at
     - id
     - level_name
+    - system
     - timestamp
     - updated_at
     type: object
@@ -345,7 +348,7 @@ info:
   contact: {}
   description: This is LogVista server.
   title: LogVista API
-  version: 0.1.5
+  version: 0.1.7
 paths:
   /healthcheck:
     get:
@@ -454,7 +457,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/schemas.LogResponse'
+              $ref: '#/definitions/schemas.Log'
             type: array
         "400":
           description: Bad Request
@@ -551,14 +554,15 @@ paths:
       summary: システム一覧取得
       tags:
       - systems
+  /systems/{systemName}:
     put:
       consumes:
       - application/json
       description: DB上に存在するシステムを更新する
       parameters:
-      - description: システムID
-        in: query
-        name: ID
+      - description: システム名
+        in: path
+        name: systemName
         required: true
         type: string
       - description: Update System Request
@@ -587,9 +591,9 @@ paths:
       - application/json
       description: DB上に存在するシステム別集計情報を取得する
       parameters:
-      - description: システムID：指定しない場合は全てのシステムを取得
+      - description: システム名：指定しない場合は全てのシステムを取得
         in: query
-        name: id
+        name: systemName
         type: string
       - default: 3600
         description: '集計時間スパン（秒）: 10秒刻みで指定可能'
