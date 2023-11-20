@@ -322,51 +322,6 @@ const docTemplate = `{
                         }
                     }
                 }
-            },
-            "put": {
-                "description": "DB上に存在するシステムを更新する",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "systems"
-                ],
-                "summary": "システム更新",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "システムID",
-                        "name": "ID",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "description": "Update System Request",
-                        "name": "system",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/schemas.SystemRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/schemas.ErrorResponse"
-                        }
-                    }
-                }
             }
         },
         "/systems/summary": {
@@ -385,8 +340,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "システムID：指定しない場合は全てのシステムを取得",
-                        "name": "id",
+                        "description": "システム名：指定しない場合は全てのシステムを取得",
+                        "name": "systemName",
                         "in": "query"
                     },
                     {
@@ -424,6 +379,53 @@ const docTemplate = `{
                     },
                     "500": {
                         "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/systems/{systemName}": {
+            "put": {
+                "description": "DB上に存在するシステムを更新する",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "systems"
+                ],
+                "summary": "システム更新",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "システム名",
+                        "name": "systemName",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Update System Request",
+                        "name": "system",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/schemas.SystemRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/schemas.ErrorResponse"
                         }
@@ -905,7 +907,7 @@ const docTemplate = `{
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
-	Version:          "0.1.5",
+	Version:          "0.1.7",
 	Host:             "127.0.0.1:8080",
 	BasePath:         "/api/v1",
 	Schemes:          []string{},

@@ -125,7 +125,8 @@ func FindLogs(db *gorm.DB, opts *FindLogsOptions) ([]models.Log, error) {
 // 指定したシステムの最新のログを取得する
 func FindLatestLog(db *gorm.DB, systemName string) (*models.Log, error) {
 	var log models.Log
-	if err := db.Table("logs").Preload("ExcTraceback").Where("system_name = ?", systemName).Order("timestamp desc").First(&log).Error; err != nil {
+	if err := db.Table("logs").Preload("ExcTraceback").Joins("JOIN systems ON systems.id = logs.system_id").
+		Where("systems.name = ?", systemName).Order("timestamp desc").First(&log).Error; err != nil {
 		return nil, err
 	}
 	return &log, nil
@@ -136,7 +137,7 @@ func FindSummaryData(
 	system *models.System,
 	timeSpan int,
 	latestTime time.Time,
-	dataCount int, // 追加のパラメータ
+	dataCount int,
 ) ([]schemas.SummaryData, error) {
 	summaryData := make([]schemas.SummaryData, 0, dataCount)
 
@@ -147,9 +148,10 @@ func FindSummaryData(
 
 		// 各ログレベルのカウントを取得
 		var infoCount, warningCount, errorCount int64
+
 		// INFOログカウント
 		err := db.Model(&models.Log{}).
-			Where("system_name = ? AND level_name = ? AND timestamp >= ? AND timestamp < ?", system.Name, "INFO", baseTime, endTime).
+			Where("system_id = ? AND level_name = ? AND timestamp >= ? AND timestamp < ?", system.ID, "INFO", baseTime, endTime).
 			Count(&infoCount).Error
 		if err != nil {
 			return nil, err
@@ -157,7 +159,7 @@ func FindSummaryData(
 
 		// WARNINGログカウント
 		err = db.Model(&models.Log{}).
-			Where("system_name = ? AND level_name = ? AND timestamp >= ? AND timestamp < ?", system.Name, "WARNING", baseTime, endTime).
+			Where("system_id = ? AND level_name = ? AND timestamp >= ? AND timestamp < ?", system.ID, "WARNING", baseTime, endTime).
 			Count(&warningCount).Error
 		if err != nil {
 			return nil, err
@@ -165,7 +167,7 @@ func FindSummaryData(
 
 		// ERRORログカウント
 		err = db.Model(&models.Log{}).
-			Where("system_name = ? AND level_name = ? AND timestamp >= ? AND timestamp < ?", system.Name, "ERROR", baseTime, endTime).
+			Where("system_id = ? AND level_name = ? AND timestamp >= ? AND timestamp < ?", system.ID, "ERROR", baseTime, endTime).
 			Count(&errorCount).Error
 		if err != nil {
 			return nil, err
