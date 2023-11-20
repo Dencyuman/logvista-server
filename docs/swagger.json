@@ -171,7 +171,7 @@
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/schemas.LogResponse"
+                                "$ref": "#/definitions/schemas.Log"
                             }
                         }
                     },
@@ -440,7 +440,6 @@
             "required": [
                 "id",
                 "level_name",
-                "system",
                 "timestamp"
             ],
             "properties": {
@@ -538,8 +537,9 @@
                     "type": "string",
                     "example": "MainProcess"
                 },
-                "system": {
-                    "$ref": "#/definitions/schemas.SystemResponse"
+                "system_name": {
+                    "type": "string",
+                    "example": "sample_system"
                 },
                 "thread": {
                     "type": "integer",
@@ -674,6 +674,10 @@
                 },
                 "system": {
                     "$ref": "#/definitions/schemas.SystemResponse"
+                },
+                "system_name": {
+                    "type": "string",
+                    "example": "sample_system"
                 },
                 "thread": {
                     "type": "integer",

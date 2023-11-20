@@ -10,7 +10,7 @@ import (
 )
 
 // schemas.Logをmodels.Logに変換
-func ConvertLogSchemaToModel(logSchema *schemas.Log) *models.Log {
+func ConvertLogSchemaToModel(logSchema *schemas.Log, SystemID string) *models.Log {
 	if logSchema == nil {
 		return nil
 	}
@@ -24,7 +24,7 @@ func ConvertLogSchemaToModel(logSchema *schemas.Log) *models.Log {
 
 	logModel := &models.Log{
 		ID:              logSchema.ID,
-		SystemID:        logSchema.System.ID,
+		SystemID:        SystemID,
 		CPUPercent:      logSchema.CPUPercent,
 		ExcType:         logSchema.ExcType,
 		ExcValue:        logSchema.ExcValue,
@@ -97,12 +97,6 @@ func ConvertLogModelToResponseSchema(logModel *models.Log) *schemas.LogResponse 
 	logSchema := &schemas.LogResponse{
 		Log: schemas.Log{
 			ID:              logModel.ID,
-			System: schemas.SystemResponse{
-				ID:       logModel.SystemID,
-				System:   schemas.System{Name: logModel.System.Name, Category: logModel.System.Category},
-				CreatedAt: logModel.System.CreatedAt,
-				UpdatedAt: logModel.System.UpdatedAt,
-			},
 			CPUPercent:      logModel.CPUPercent,
 			ExcType:         logModel.ExcType,
 			ExcValue:        logModel.ExcValue,
@@ -129,6 +123,12 @@ func ConvertLogModelToResponseSchema(logModel *models.Log) *schemas.LogResponse 
 			CPUIdleTime:     logModel.CPUIdleTime,
 			Timestamp:       logModel.Timestamp,
 			Attributes:      attributes,
+		},
+		System: schemas.SystemResponse{
+			ID:       logModel.SystemID,
+			System:   schemas.System{Name: logModel.System.Name, Category: logModel.System.Category},
+			CreatedAt: logModel.System.CreatedAt,
+			UpdatedAt: logModel.System.UpdatedAt,
 		},
 		CreatedAt: logModel.CreatedAt,
 		UpdatedAt: logModel.UpdatedAt,

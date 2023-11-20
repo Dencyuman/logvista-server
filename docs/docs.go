@@ -177,7 +177,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/schemas.LogResponse"
+                                "$ref": "#/definitions/schemas.Log"
                             }
                         }
                     },
@@ -446,7 +446,6 @@ const docTemplate = `{
             "required": [
                 "id",
                 "level_name",
-                "system",
                 "timestamp"
             ],
             "properties": {
@@ -544,8 +543,9 @@ const docTemplate = `{
                     "type": "string",
                     "example": "MainProcess"
                 },
-                "system": {
-                    "$ref": "#/definitions/schemas.SystemResponse"
+                "system_name": {
+                    "type": "string",
+                    "example": "sample_system"
                 },
                 "thread": {
                     "type": "integer",
@@ -680,6 +680,10 @@ const docTemplate = `{
                 },
                 "system": {
                     "$ref": "#/definitions/schemas.SystemResponse"
+                },
+                "system_name": {
+                    "type": "string",
+                    "example": "sample_system"
                 },
                 "thread": {
                     "type": "integer",

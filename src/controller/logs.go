@@ -20,7 +20,7 @@ import (
 // @Accept json
 // @Produce json
 // @Router /logs/python-logvista [post]
-// @Success 200 {object} []schemas.LogResponse
+// @Success 200 {object} []schemas.Log
 // @Failure 400 {object} schemas.ErrorResponse
 // @Failure 500 {object} schemas.ErrorResponse
 // @Param logs body []schemas.Log false "ログデータ"
@@ -34,7 +34,7 @@ func (ctrl *AppController) RecordLogs(c *gin.Context) {
 
 	// systemsテーブルにシステム名が存在するか確認し存在しなければシステムを追加
 	for _, schemaLog := range schemaLogs {
-		modelSystem, err := crud.FindSystemByName(ctrl.DB, schemaLog.System.Name)
+		modelSystem, err := crud.FindSystemByName(ctrl.DB, schemaLog.SystemName)
 		if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 			// データベースエラーが発生した場合、500 エラーを返す
 			log.Printf("Error finding system: %v\n", err)
@@ -42,7 +42,7 @@ func (ctrl *AppController) RecordLogs(c *gin.Context) {
 			return
 		}
 		if modelSystem == nil {
-			modelSystem = &models.System{Name: schemaLog.System.Name, Category: "Unknown"}
+			modelSystem = &models.System{Name: schemaLog.SystemName, Category: "Unknown"}
 			if err := crud.InsertSystem(ctrl.DB, modelSystem); err != nil {
 				log.Printf("Error inserting system: %v\n", err)
 				c.JSON(http.StatusInternalServerError, schemas.ErrorResponse{Message: "Internal Server Error"})
@@ -55,7 +55,14 @@ func (ctrl *AppController) RecordLogs(c *gin.Context) {
 	// schemas.Logをmodels.Logに変換
 	var modelLogs []models.Log
 	for _, schemaLog := range schemaLogs {
-		modelLog := converter.ConvertLogSchemaToModel(&schemaLog)
+		modelSystem, err := crud.FindSystemByName(ctrl.DB, schemaLog.SystemName)
+		if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+			// データベースエラーが発生した場合、500 エラーを返す
+			log.Printf("Error finding system: %v\n", err)
+			c.JSON(http.StatusInternalServerError, schemas.ErrorResponse{Message: "Internal Server Error"})
+			return
+		}
+		modelLog := converter.ConvertLogSchemaToModel(&schemaLog, modelSystem.ID)
 		if modelLog == nil {
 			log.Printf("Error converting log schema to model: %v\n", schemaLog.ID)
 			continue

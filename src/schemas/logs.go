@@ -15,7 +15,7 @@ type FlexibleLog struct {
 // swagger:request log
 type Log struct {
 	ID              string                 `json:"id" binding:"required" example:"00000000-0000-0000-0000-000000000000"`
-	System          SystemResponse         `json:"system" binding:"required"`
+	SystemName      string                 `json:"system_name" example:"sample_system"`
 	CPUPercent      float64                `json:"cpu_percent" example:"0.0"`
 	ExcType         string                 `json:"exc_type" example:"Exception"`
 	ExcValue        string                 `json:"exc_value" example:"sample"`
@@ -56,6 +56,7 @@ type Traceback struct {
 // swagger:response logResponse
 type LogResponse struct {
 	Log
+	System       SystemResponse      `json:"system" binding:"required"`
 	CreatedAt    time.Time           `json:"created_at" binding:"required" example:"2023-01-01T00:00:00.000000+09:00"`
 	UpdatedAt    time.Time           `json:"updated_at" binding:"required" example:"2023-01-01T00:00:00.000000+09:00"`
 	ExcTraceback []TracebackResponse `json:"exc_traceback"`
