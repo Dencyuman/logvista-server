@@ -125,8 +125,8 @@ func ConvertLogModelToResponseSchema(logModel *models.Log) *schemas.LogResponse 
 			Attributes:      attributes,
 		},
 		System: schemas.SystemResponse{
-			ID:       logModel.SystemID,
-			System:   schemas.System{Name: logModel.System.Name, Category: logModel.System.Category},
+			ID:        logModel.SystemID,
+			System:    schemas.System{Name: logModel.System.Name, Category: logModel.System.Category},
 			CreatedAt: logModel.System.CreatedAt,
 			UpdatedAt: logModel.System.UpdatedAt,
 		},
