@@ -64,7 +64,6 @@ export default function Sidescreen({visible, setVisible, selectedPage, setSelect
     const onImageError = () => {
         setImageLoaded(false);
     };
-    console.log(`${VITE_API_URL}/assets/logo-with-name.png`)
 
     return (
         <Sidebar className="p-0" visible={visible} onHide={() => setVisible(false)}>

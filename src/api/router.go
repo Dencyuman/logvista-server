@@ -46,16 +46,16 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 
 	router.GET("/api/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 
-	router.Static("/static", "./src/static")
+	router.Static("/static", "./static")
 	router.GET("/", func(c *gin.Context) {
-		c.File("./src/static/index.html")
+		c.File("./static/index.html")
 	})
 	router.GET("/assets/*any", func(c *gin.Context) {
 		filePath := c.Param("any")
-		c.File("./src/static/assets/" + filePath)
+		c.File("./static/assets/" + filePath)
 	})
 	router.NoRoute(func(c *gin.Context) {
-		c.File("./src/static/index.html")
+		c.File("./static/index.html")
 	})
 
 	return router

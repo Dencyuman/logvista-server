@@ -8,12 +8,12 @@ import (
 )
 
 type Config struct {
-	Host       string
-	Port       string
-	User       string
-	Password   string
+	DbHost       string
+	DbPort       string
+	DbUser       string
+	DbPassword   string
 	Dbname     string
-	Sslmode    string
+	DbSslmode    string
 	ServerPort string
 }
 
@@ -25,12 +25,12 @@ func newConfig() *Config {
 	}
 
 	cfg := &Config{
-		Host:       getEnv("HOST", "localhost"),
-		Port:       getEnv("PORT", "5432"),
-		User:       getEnv("DB_USER", "postgres"),
-		Password:   getEnv("DB_PASSWORD", "postgres"),
+		DbHost:       getEnv("DB_HOST", "localhost"),
+		DbPort:       getEnv("DB_PORT", "5432"),
+		DbUser:       getEnv("DB_USER", "postgres"),
+		DbPassword:   getEnv("DB_PASSWORD", "postgres"),
 		Dbname:     getEnv("DB_NAME", "logvista"),
-		Sslmode:    getEnv("DB_SSLMODE", "disable"),
+		DbSslmode:    getEnv("DB_SSLMODE", "disable"),
 		ServerPort: getEnv("SERVER_PORT", "8080"),
 	}
 

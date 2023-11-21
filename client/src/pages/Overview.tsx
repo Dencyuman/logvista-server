@@ -12,7 +12,7 @@ import { Tag } from 'primereact/tag';
 import { useNavigate, useOutletContext } from 'react-router-dom';
 import { overviewLayout } from '../service/SystemService';
 import { OverviewData, OverviewChart } from '../components/charts/OverviewChart';
-import apiClient, { SchemasSummary, SchemasSummaryData } from '../ApiClient'
+import apiClient, { SchemasSummary, SchemasSummaryData, VITE_API_URL } from '../ApiClient'
 import { AppContextType } from '../templates/AppTemplate';
 import { SkeletonGridItem } from '../components/overview/SkeltonGridItem';
 import CategoryTag from '../components/dialogs/CategoryTag';
@@ -243,7 +243,7 @@ export default function Overview() {
 
     const start = (
         <div className="flex align-items-center sm:pr-2">
-            <img alt="logo" src="https://raw.githubusercontent.com/Dencyuman/logvista-cloud/main/client/src/assets/logo.png" height="40" className="mx-2"></img>
+            <img alt="logo" src={`${VITE_API_URL}/assets/logo.png`} height="40" className="mx-2"></img>
             <h2 className="my-0">Overview</h2>
         </div>
     );

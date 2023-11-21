@@ -6,7 +6,7 @@ import "primereact/resources/themes/lara-light-indigo/theme.css";
 
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import apiClient, { SchemasSummary, SchemasSummaryData, SchemasSystemResponse, SchemasPaginatedLogResponse } from '../ApiClient';
+import apiClient, { SchemasSummary, SchemasSummaryData, SchemasSystemResponse, SchemasPaginatedLogResponse, VITE_API_URL } from '../ApiClient';
 import { overviewLayout } from '../service/SystemService';
 import { OverviewData, OverviewChart } from '../components/charts/OverviewChart';
 import LogDataTable from '../components/dashboard/LogDataTable';
@@ -136,7 +136,7 @@ export default function DashBoard() {
 
     const start = (
         <div className="flex align-items-center sm:pr-2">
-            <img alt="logo" src="https://raw.githubusercontent.com/Dencyuman/logvista-cloud/main/client/src/assets/logo.png" height="40" className="mx-2"></img>
+            <img alt="logo" src={`${VITE_API_URL}/assets/logo.png`} height="40" className="mx-2"></img>
             <h2 className="hidden sm:block my-0">DashBoard</h2>
         </div>
     );
