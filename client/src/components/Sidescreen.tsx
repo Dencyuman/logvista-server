@@ -11,6 +11,7 @@ import { ListBox } from 'primereact/listbox';
 import { Page } from '../templates/AppTemplate';
 import { useEffect, useState } from 'react';
 import { Skeleton } from 'primereact/skeleton';
+import { VITE_API_URL } from '../ApiClient';
 
 interface SidescreenProps{
     visible: boolean;
@@ -63,6 +64,7 @@ export default function Sidescreen({visible, setVisible, selectedPage, setSelect
     const onImageError = () => {
         setImageLoaded(false);
     };
+    console.log(`${VITE_API_URL}/assets/logo-with-name.png`)
 
     return (
         <Sidebar className="p-0" visible={visible} onHide={() => setVisible(false)}>
@@ -73,7 +75,7 @@ export default function Sidescreen({visible, setVisible, selectedPage, setSelect
         )}
         <img
             alt="logo"
-            src="https://raw.githubusercontent.com/Dencyuman/logvista-cloud/main/client/src/assets/logo-with-name.png"
+            src={`${VITE_API_URL}/assets/logo-with-name.png`}
             className={`w-full px-6 mb-4 ${!imageLoaded ? 'hidden' : ''}`}
             onLoad={onImageLoad}
             onError={onImageError}

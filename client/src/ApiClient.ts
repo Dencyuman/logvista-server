@@ -13,7 +13,9 @@ import {
     SchemasTracebackResponse
 } from './api';
 
-export const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8080/api/v1/"
+export const VITE_API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080"
+export const BASE_PATH = import.meta.env.VITE_API_BASE_PATH || "/api/v1"
+export const BASE_URL = VITE_API_URL + BASE_PATH
 
 const generalApiClient = GeneralApiFactory(new Configuration({ basePath: BASE_URL }))
 const logsApiClient = LogsApiFactory(new Configuration({ basePath: BASE_URL }))
