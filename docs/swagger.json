@@ -4,9 +4,8 @@
         "description": "This is LogVista server.",
         "title": "LogVista API",
         "contact": {},
-        "version": "0.1.8"
+        "version": "0.1.9"
     },
-    "host": "127.0.0.1:8080",
     "basePath": "/api/v1",
     "paths": {
         "/healthcheck": {

@@ -4,14 +4,14 @@ import (
 	"flag"
 	"log"
 
+	"github.com/Dencyuman/logvista-server/config"
 	api "github.com/Dencyuman/logvista-server/src/api"
 	database "github.com/Dencyuman/logvista-server/src/database"
 )
 
 // @title LogVista API
-// @version 0.1.8
+// @version 0.1.9
 // @description This is LogVista server.
-// @host 127.0.0.1:8080
 // @BasePath /api/v1
 func main() {
 	seed := flag.Bool("seed", false, "Set to true to seed the database")
@@ -33,7 +33,7 @@ func main() {
 		}
 	} else {
 		router := api.SetupRouter(db)
-		router.Run(":8080")
+		router.Run("0.0.0.0:" + config.AppConfig.ServerPort)
 	}
 
 }

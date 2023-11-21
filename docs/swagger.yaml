@@ -343,12 +343,11 @@ definitions:
         example: <module>
         type: string
     type: object
-host: 127.0.0.1:8080
 info:
   contact: {}
   description: This is LogVista server.
   title: LogVista API
-  version: 0.1.8
+  version: 0.1.9
 paths:
   /healthcheck:
     get:

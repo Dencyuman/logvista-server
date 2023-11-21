@@ -907,8 +907,8 @@ const docTemplate = `{
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
-	Version:          "0.1.8",
-	Host:             "127.0.0.1:8080",
+	Version:          "0.1.9",
+	Host:             "",
 	BasePath:         "/api/v1",
 	Schemes:          []string{},
 	Title:            "LogVista API",
