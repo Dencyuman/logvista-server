@@ -347,7 +347,7 @@ info:
   contact: {}
   description: This is LogVista server.
   title: LogVista API
-  version: 0.1.9
+  version: 0.1.10
 paths:
   /healthcheck:
     get:

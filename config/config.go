@@ -34,8 +34,6 @@ func newConfig() *Config {
 		ServerPort: getEnv("SERVER_PORT", "8080"),
 	}
 
-	log.Printf("Config: %+v\n", cfg)
-
 	return cfg
 }
 

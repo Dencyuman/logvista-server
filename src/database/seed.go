@@ -192,12 +192,6 @@ func seedLogTable(db *gorm.DB) error {
 
 // 全てのSeedingを実行する
 func Seed(db *gorm.DB) error {
-	if err := ResetTables(db); err != nil {
-		return err
-	}
-	if err := Migrate(db); err != nil {
-		return err
-	}
 	if err := seedSystemTable(db); err != nil {
 		return err
 	}
