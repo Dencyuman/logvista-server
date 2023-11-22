@@ -26,10 +26,9 @@ export default function AppTemplate() {
         setSelectedPage(page);
     };
     const pages = useMemo(() => ([
-        { name: 'Home', path: '/', iconClassName: 'pi pi-home' },
-        { name: 'Overview', path: '/overview', iconClassName: 'pi pi-th-large'},
+        { name: 'Overview', path: '/', iconClassName: 'pi pi-home'},
         { name: 'DashBoard', path: '/dashboard', iconClassName: 'pi pi-chart-bar' },
-        // { name: 'Report', path: '/report', iconClassName: 'pi pi-chart-pie' },
+        { name: 'SetupGuide', path: '/setup-guide', iconClassName: 'pi pi-box' },
         { name: 'Settings', path: '/settings', iconClassName: 'pi pi-cog' },
     ]), []);
 
