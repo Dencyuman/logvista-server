@@ -5,22 +5,41 @@ import (
 	"flag"
 	"log"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/Dencyuman/logvista-server/config"
 	api "github.com/Dencyuman/logvista-server/src/api"
 	database "github.com/Dencyuman/logvista-server/src/database"
+	util "github.com/Dencyuman/logvista-server/src/utils"
 )
 
 // @title LogVista API
-// @version 0.1.10
+// @version 0.1.11
 // @description This is LogVista server.
 // @BasePath /api/v1
 func main() {
 	seed := flag.Bool("seed", false, "Set to true to seed the database")
 	migrate := flag.Bool("migrate", false, "Set to true to migrate the database")
 	reset := flag.Bool("reset", false, "Set to true to reset the database")
+	tmpl := flag.Bool("tmpl", false, "Set to true to run the server in Generate Template mode")
 	flag.Parse()
+
+	if *tmpl {
+		staticDirPath := "./static/"
+		path, err := util.FindFirstJSFile(staticDirPath)
+		if err != nil {
+			log.Fatal("Failed to find JS files:", err)
+		}
+		jsFile := filepath.Base(path)
+		tmplPath := "./static/" + jsFile
+		outputPath := "./static/assets/" + jsFile
+		err = util.GenerateJSFileFromTemplate(tmplPath, outputPath)
+		if err != nil {
+			log.Fatal("Failed to generate JS file:", err)
+		}
+		return
+	}
 
 	db, err := initializeDB()
 	if err != nil {

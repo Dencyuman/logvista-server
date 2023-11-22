@@ -8,13 +8,14 @@ import (
 )
 
 type Config struct {
-	DbHost       string
-	DbPort       string
-	DbUser       string
-	DbPassword   string
+	DbHost     string
+	DbPort     string
+	DbUser     string
+	DbPassword string
 	Dbname     string
-	DbSslmode    string
+	DbSslmode  string
 	ServerPort string
+	ViteApiUrl string
 }
 
 func newConfig() *Config {
@@ -25,13 +26,14 @@ func newConfig() *Config {
 	}
 
 	cfg := &Config{
-		DbHost:       getEnv("DB_HOST", "localhost"),
-		DbPort:       getEnv("DB_PORT", "5432"),
-		DbUser:       getEnv("DB_USER", "postgres"),
-		DbPassword:   getEnv("DB_PASSWORD", "postgres"),
+		DbHost:     getEnv("DB_HOST", "localhost"),
+		DbPort:     getEnv("DB_PORT", "5432"),
+		DbUser:     getEnv("DB_USER", "postgres"),
+		DbPassword: getEnv("DB_PASSWORD", "postgres"),
 		Dbname:     getEnv("DB_NAME", "logvista"),
-		DbSslmode:    getEnv("DB_SSLMODE", "disable"),
+		DbSslmode:  getEnv("DB_SSLMODE", "disable"),
 		ServerPort: getEnv("SERVER_PORT", "8080"),
+		ViteApiUrl: getEnv("VITE_API_URL", "http://localhost:8080/api/v1"),
 	}
 
 	return cfg
