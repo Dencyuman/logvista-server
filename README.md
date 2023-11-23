@@ -63,3 +63,8 @@ Logvista server for On-Premise
     - `--seed`オプションを付けることで、DBのシードデータを投入する
     - `--reset`オプションを付けることで、DBのテーブル全削除を実行する
         - `--reset`オプション実行後は、`--migrate`オプションを付けてサーバーを起動すること
+5. 開発時(ビルド前)は以下のコマンドでサーバーを起動すること
+    - オプションは上記と同様
+    ```bash
+    go run main.go wire_gen.go
+    ```
