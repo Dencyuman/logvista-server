@@ -15,7 +15,7 @@ import (
 )
 
 // @title LogVista API
-// @version 0.1.11
+// @version 0.1.13
 // @description This is LogVista server.
 // @BasePath /api/v1
 func main() {

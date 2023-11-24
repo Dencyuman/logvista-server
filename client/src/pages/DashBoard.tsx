@@ -11,11 +11,14 @@ import { overviewLayout } from '../service/SystemService';
 import { OverviewData, OverviewChart } from '../components/charts/OverviewChart';
 import LogDataTable from '../components/dashboard/LogDataTable';
 import { Dropdown } from 'primereact/dropdown';
-import { Menubar } from 'primereact/menubar';
 import { SkeletonLogData } from '../components/dashboard/SkeletonLogData';
 import { SkeletonChart } from '../components/dashboard/SkeletonChart';
+import { Toolbar } from 'primereact/toolbar';
 
 const groupSystemsByCategory = (systems: SchemasSystemResponse[]) => {
+    // systemsがnullまたはundefinedの場合、空の配列を返す
+    if (!systems) return [];
+
     const grouped = systems.reduce((acc, system) => {
         // カテゴリーと名前がundefinedでないことを確認
         if (system.category && system.name) {
@@ -98,7 +101,11 @@ export default function DashBoard() {
                 }
             };
 
-            fetchLogData();
+            const interval = setInterval(fetchLogData, 5000);
+
+            return () => {
+                clearInterval(interval);
+            };
         }
     }, [selectedSystemName, systems, pageSize]);
 
@@ -154,46 +161,46 @@ export default function DashBoard() {
     />
 
 
-// 通常のDashBoardコンポーネントのレンダリング
-return (
-    <div>
-        <div className="flex flex-column align-items-start gap-3 py-2">
-            <div className="w-full">
-                <Menubar start={start} end={end} />
-            </div>
-            {systemNameExists && (
-                <>
-                    {isSummaryLoading || summary.length === 0 ? (
-                        <SkeletonChart />
-                    ) : (
-                            <OverviewChart
-                                data={convertToOverviewData(summary[0].data)}
-                                layout={overviewLayout}
-                                customLayoutProps={{
-                                    width: "100%",
-                                    height: "200px",
-                                    top: 20,
-                                    right: 80,
-                                    left: 40,
-                                    bottom: 5
-                                }}
-                                showBrush={true}
-                                brushOrigin={'end'}
-                                brushLength={60}
-                            />
-                        )
-                    }
-                    <div className="w-full">
-                        {isLogDataLoading ? (
-                            <SkeletonLogData />
+    // 通常のDashBoardコンポーネントのレンダリング
+    return (
+        <div>
+            <div className="flex flex-column align-items-start gap-3 py-2">
+                <div className="w-full">
+                    <Toolbar start={start} end={end} className="p-2" />
+                </div>
+                {systemNameExists && (
+                    <>
+                        {isSummaryLoading || summary.length === 0 ? (
+                            <SkeletonChart />
                         ) : (
-                            <LogDataTable logData={logData} />
-                        )}
-                    </div>
-                </>
-            )}
+                                <OverviewChart
+                                    data={convertToOverviewData(summary[0].data)}
+                                    layout={overviewLayout}
+                                    customLayoutProps={{
+                                        width: "100%",
+                                        height: "200px",
+                                        top: 20,
+                                        right: 80,
+                                        left: 40,
+                                        bottom: 5
+                                    }}
+                                    showBrush={true}
+                                    brushOrigin={'end'}
+                                    brushLength={60}
+                                />
+                            )
+                        }
+                        <div className="w-full">
+                            {isLogDataLoading ? (
+                                <SkeletonLogData />
+                            ) : (
+                                <LogDataTable logData={logData} />
+                            )}
+                        </div>
+                    </>
+                )}
+            </div>
         </div>
-    </div>
-);
+    );
 
 }

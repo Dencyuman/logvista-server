@@ -4,7 +4,7 @@
         "description": "This is LogVista server.",
         "title": "LogVista API",
         "contact": {},
-        "version": "0.1.11"
+        "version": "0.1.13"
     },
     "basePath": "/api/v1",
     "paths": {

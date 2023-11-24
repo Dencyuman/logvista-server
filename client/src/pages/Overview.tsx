@@ -16,14 +16,14 @@ import apiClient, { SchemasSummary, SchemasSummaryData, VITE_API_URL } from '../
 import { AppContextType } from '../templates/AppTemplate';
 import { SkeletonGridItem } from '../components/overview/SkeltonGridItem';
 import CategoryTag from '../components/dialogs/CategoryTag';
-import LogDetailDialog from '../components/dialogs/LogDetailDialog';
-import { Menubar } from 'primereact/menubar';
+import { Toolbar } from 'primereact/toolbar';
 
 
 export default function Overview() {
     const navigate = useNavigate();
     // const [systems, setSystems] = useState<System[]>([]);
     const [summary, setSummary] = useState<SchemasSummary[]>([]);
+    const [isAutoReload, setIsAutoReload] = useState(true);
 
     const refreshSummary = async () => {
         try {
@@ -51,6 +51,7 @@ export default function Overview() {
     }
 
     const fetchData = async () => {
+        console.log(`Fetching data...${isAutoReload}`)
         try {
             const res = await apiClient.systemsSummaryGet();
             setSummary(res.data);
@@ -60,30 +61,23 @@ export default function Overview() {
     };
 
     useEffect(() => {
-        // スケルトン用のダミーデータをセット
-        const skeletonData = Array(6).fill(null); // 6は表示したいスケルトンの数
+        const skeletonData = Array(6).fill(null);
         setSummary(skeletonData);
 
-        // 実際のデータをフェッチする関数を定義
         const fetchAndSetData = async () => {
-            try {
-                await fetchData(); // fetchData 内で setSummary が呼ばれると想定
-            } catch (error) {
-                console.error("Error fetching data: ", error);
+            if (isAutoReload) {
+                try {
+                    await fetchData();
+                } catch (error) {
+                    console.error("Error fetching data: ", error);
+                }
             }
         };
-        // 初回のデータフェッチを実行
-        fetchAndSetData();
-        // 5秒ごとにデータを更新するためのインターバルを設定
+
         const interval = setInterval(fetchAndSetData, 5000);
-        // 1分後にデータのリアルタイム更新を停止するタイマーを設定
-        const timer = setTimeout(() => {
-            clearInterval(interval);
-        }, 120000); // 1分 = 120000ミリ秒
-        // コンポーネントのアンマウント時にインターバルとタイマーをクリア
+
         return () => {
             clearInterval(interval);
-            clearTimeout(timer);
         };
     }, []);
 
@@ -163,6 +157,7 @@ export default function Overview() {
     const fetchCategories = async () => {
         try {
             const res = await apiClient.systemsGet();
+            if (!res.data) return;
             const categories = res.data
                 .map((system) => system.category)
                 .filter((category): category is string => !!category); // undefined または空の文字列を除外
@@ -176,14 +171,6 @@ export default function Overview() {
     useEffect(() => {
         fetchCategories();
     }, []);
-
-    const [logDetailVisible, setLogDetailVisible] = useState(false);
-    const [selectedSummary, setSelectedSummary] = useState<SchemasSummary | null>(null);
-
-    const showLogDetails = (summary: SchemasSummary) => {
-        setSelectedSummary(summary);
-        setLogDetailVisible(true);
-    };
 
     const gridItem = (summary: SchemasSummary) => {
         // 各ボタンに一意のクラス名を生成
@@ -217,7 +204,7 @@ export default function Overview() {
                         />
                     </div>
                     <div className="flex align-items-center justify-content-between flex-row">
-                        <div className="w-10 p-2 border-round-sm cursor-pointer hover:surface-100" onClick={() => showLogDetails(summary)}>
+                        <div className="w-10 p-2">
                             <h4 className="m-0 p-0 font-bold">最新取得ログ</h4>
                             <div className="text-base flex flex-wrap items-baseline">
                                 <div className="mr-2">{formatDate(new Date(summary.latest_log.timestamp))}</div>
@@ -248,21 +235,54 @@ export default function Overview() {
         </div>
     );
 
+    useEffect(() => {
+        console.log("isAutoReload updated to: ", isAutoReload);
+    }, [isAutoReload]);
+    
+    const handleToggleReload = () => {
+        const reversedIsAutoReload = !isAutoReload;
+        console.log("isAutoReload: ", isAutoReload);
+        console.log("reversed isAutoReload: ", reversedIsAutoReload)
+        setIsAutoReload(reversedIsAutoReload);
+    };
+
+    const handleManualReload = () => {
+        const fetchAndSetData = async () => {
+            try {
+                await fetchData();
+            } catch (error) {
+                console.error("Error fetching data: ", error);
+            }
+        };
+        fetchAndSetData();
+    };
+
+    const endItem = (
+        <div className="flex">
+            <Button
+                label={isAutoReload ? "Auto" : "Manual"}
+                className="p-0 w-5rem"
+                onClick={handleToggleReload}
+                severity="secondary"
+                text
+            />
+            <Button
+                icon={isAutoReload ? "pi pi-spin pi-refresh" : "pi pi-refresh"}
+                onClick={handleManualReload}
+                disabled={isAutoReload}
+                className="p-button-secondary"
+                text
+            />
+        </div>
+    );
+
     return (
         <div className="card">
             <div className="w-full">
-                <Menubar start={start} />
+                <Toolbar start={start} end={endItem} className="p-2" />
             </div>
             <Tooltip target=".goToDashBoardButton" content="Jump to DashBoard." position="left"/>
             <DataView value={summary} layout={"grid"} itemTemplate={itemTemplate} />
-            {selectedSummary && (
-                <LogDetailDialog
-                    title="最新ログ詳細"
-                    logData={selectedSummary.latest_log}
-                    visible={logDetailVisible}
-                    onHide={() => setLogDetailVisible(false)}
-                />
-            )}
         </div>
-    )
+    );
 }
