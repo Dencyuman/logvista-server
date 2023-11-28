@@ -101,11 +101,7 @@ export default function DashBoard() {
                 }
             };
 
-            const interval = setInterval(fetchLogData, 5000);
-
-            return () => {
-                clearInterval(interval);
-            };
+            fetchLogData();
         }
     }, [selectedSystemName, systems, pageSize]);
 
