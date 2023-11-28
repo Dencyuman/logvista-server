@@ -30,7 +30,7 @@ export default function Header({ setVisible, imageLink }: HeaderProps) {
         const breadcrumbItems = pathnames.map((path, index) => {
             const url = `/${pathnames.slice(0, index + 1).join('/')}`;
             return {
-                label: path.charAt(0).toUpperCase() + path.slice(1),
+                label: decodeURIComponent(path.charAt(0).toUpperCase() + path.slice(1)),
                 command: () => navigate(url),
             };
         });
