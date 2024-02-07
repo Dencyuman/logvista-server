@@ -1,6 +1,10 @@
 # logvista-server
 Logvista server for On-Premise
 
+## ドキュメント
+
+[Logvista Docs](https://takotakocyumans-organization.gitbook.io/logvista-docs/)
+
 ## フロントエンドのビルド
 1. `yarn build`する際は、`client`ディレクトリ内の`.env`ファイルの`VITE_API_URL`の値を以下のように設定すること
     - `{{.VITE_API_URL}}`は、サーバー起動時に、サーバー側の環境変数`VITE_API_URL`の値に置換される
