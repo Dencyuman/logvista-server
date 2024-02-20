@@ -9,10 +9,10 @@ read -p "Enter your server_name (domain or public IP): " server_name
 
 # Nginxのインストール
 echo "Installing Nginx..."
-sudo yum install -y nginx
+sudo amazon-linux-extras install -y nginx1
 
 # Nginx設定ファイルの作成
-NGINX_CONF="/etc/nginx/conf.d/my_fastapi_app.conf"
+NGINX_CONF="/etc/nginx/conf.d/logvista.conf"
 echo "server {
     listen 80; # 外部からのアクセスを受けるポートを80に設定
     server_name $server_name;  # ユーザー入力を反映
