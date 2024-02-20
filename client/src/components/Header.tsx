@@ -7,7 +7,7 @@ import "primereact/resources/themes/lara-light-indigo/theme.css";
 import { Button } from 'primereact/button';
 import { BreadCrumb } from 'primereact/breadcrumb';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Avatar } from 'primereact/avatar';
+// import { Avatar } from 'primereact/avatar';
 import { useEffect, useState } from 'react';
 
 type BreadcrumbItem = {
@@ -20,7 +20,7 @@ type HeaderProps = {
     imageLink?: string;
 };
 
-export default function Header({ setVisible, imageLink }: HeaderProps) {
+export default function Header({ setVisible }: HeaderProps) {
     const navigate = useNavigate();
     const location = useLocation();
     const [breadcrumbItems, setBreadcrumbItems] = useState<BreadcrumbItem[]>([]);
@@ -51,15 +51,15 @@ export default function Header({ setVisible, imageLink }: HeaderProps) {
                 <BreadCrumb model={breadcrumbItems} home={home} className="border-none hidden sm:block" />
             </div>
             <div className="flex align-items-center">
-                <Button icon="pi pi-search" text rounded className="p-button-rounded p-button-secondary" aria-label="検索" />
-                <Button icon="pi pi-bell" text rounded className="p-button-rounded p-button-secondary" aria-label="通知" />
-                <div className='pl-2 pr-3 cursor-pointer'>
-                    {imageLink ? (
-                        <Avatar image={imageLink} shape="circle" />
-                    ) : (
-                        <Avatar icon="pi pi-user" shape="circle" />
-                    )}
-                </div>
+                {/*<Button icon="pi pi-search" text rounded className="p-button-rounded p-button-secondary" aria-label="検索" />*/}
+                {/*<Button icon="pi pi-bell" text rounded className="p-button-rounded p-button-secondary" aria-label="通知" />*/}
+                {/*<div className='pl-2 pr-3 cursor-pointer'>*/}
+                {/*    {imageLink ? (*/}
+                {/*        <Avatar image={imageLink} shape="circle" />*/}
+                {/*    ) : (*/}
+                {/*        <Avatar icon="pi pi-user" shape="circle" />*/}
+                {/*    )}*/}
+                {/*</div>*/}
             </div>
         </div>
     )

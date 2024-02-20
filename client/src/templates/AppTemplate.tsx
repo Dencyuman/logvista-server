@@ -28,8 +28,8 @@ export default function AppTemplate() {
     const pages = useMemo(() => ([
         { name: 'Overview', path: '/', iconClassName: 'pi pi-home'},
         { name: 'DashBoard', path: '/dashboard', iconClassName: 'pi pi-chart-bar' },
-        { name: 'SetupGuide', path: '/setup-guide', iconClassName: 'pi pi-box' },
-        { name: 'Settings', path: '/settings', iconClassName: 'pi pi-cog' },
+        // { name: 'SetupGuide', path: '/setup-guide', iconClassName: 'pi pi-box' },
+        // { name: 'Settings', path: '/settings', iconClassName: 'pi pi-cog' },
     ]), []);
 
     const [selectedPage, setSelectedPage] = useState(pages[0]);
@@ -49,7 +49,16 @@ export default function AppTemplate() {
                 <Sidescreen visible={visible} setVisible={setVisible} selectedPage={selectedPage} setSelectedPage={setSelectedPage} pages={pages}/>
                 <Header setVisible={setVisible} imageLink={imageLink ? imageLink : undefined}/>
                 <div className="px-2 sm:px-6 m-auto container">
-                    <Outlet context={{ handlePageChange }}/>
+                    <div className="bg-red-400 text-white py-2 px-4 mb-2 text-left border-round">
+                        <p className="m-0">
+                            これはデモページです。
+                            <a href="https://takotakocyumans-organization.gitbook.io/logvista-docs/" target="_blank" className="text-white font-bold">
+                                Logvista公式ドキュメント
+                            </a>
+                            を参照し、実環境はオンプレミスで構築してください。
+                        </p>
+                    </div>
+                    <Outlet context={{handlePageChange}}/>
                 </div>
             </div>
         </div>
