@@ -18,6 +18,8 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 	appController := &controller.AppController{DB: db}
 
 	docs.SwaggerInfo.BasePath = "/api/v1"
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
+
 	v1 := router.Group("/api/v1")
 	{
 		generalGroup := v1.Group("/")
@@ -41,10 +43,9 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 			systemsGroup.GET("/", appController.GetSystems)
 			systemsGroup.GET("/summary", appController.GetSystemSummary)
 			systemsGroup.PUT("/:systemName", appController.UpdateSystem)
+			systemsGroup.DELETE("/:systemId", appController.DeleteSystem)
 		}
 	}
-
-	router.GET("/api/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 
 	router.Static("/static", "./static")
 	router.GET("/", func(c *gin.Context) {

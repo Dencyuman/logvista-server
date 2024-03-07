@@ -553,6 +553,39 @@ paths:
       summary: システム一覧取得
       tags:
       - systems
+  /systems/{systemId}:
+    delete:
+      consumes:
+      - application/json
+      description: システムとその関連ログデータを削除する
+      parameters:
+      - description: システムid
+        in: path
+        name: systemId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Delete Success
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+      summary: システム削除
+      tags:
+      - systems
   /systems/{systemName}:
     put:
       consumes:

@@ -193,3 +193,42 @@ func (ctrl *AppController) UpdateSystem(c *gin.Context) {
 
 	c.JSON(http.StatusOK, "OK")
 }
+
+// @Summary システム削除
+// @Description システムとその関連ログデータを削除する
+// @Tags systems
+// @Accept json
+// @Produce json
+// @Router /systems/{systemId} [delete]
+// @Param systemId path string true "システムid"
+// @Success 200 {string} string "Delete Success"
+// @Failure 400 {object} schemas.ErrorResponse
+// @Failure 404 {object} schemas.ErrorResponse
+// @Failure 500 {object} schemas.ErrorResponse
+func (ctrl *AppController) DeleteSystem(c *gin.Context) {
+	// パスパラメータからIDを取得する
+	systemID := c.Param("systemId")
+
+	// IDが提供されていない場合は、エラーメッセージを返す
+	if systemID == "" {
+		c.JSON(http.StatusBadRequest, schemas.ErrorResponse{Message: "System ID is required"})
+		return
+	}
+
+	// パスパラメータから取得したIDを使用してシステムを見つける
+	modelsSystem, err := crud.FindSystemByID(ctrl.DB, systemID)
+	if err != nil {
+		log.Printf("Error finding system by id: %v\n", err)
+		c.JSON(http.StatusNotFound, schemas.ErrorResponse{Message: "System not found"})
+		return
+	}
+
+	// システムを削除する
+	if err := crud.DeleteSystem(ctrl.DB, modelsSystem.ID); err != nil {
+		log.Printf("Error deleting system: %v\n", err)
+		c.JSON(http.StatusInternalServerError, schemas.ErrorResponse{Message: "Internal Server Error"})
+		return
+	}
+
+	c.JSON(http.StatusOK, "Delete Success")
+}
