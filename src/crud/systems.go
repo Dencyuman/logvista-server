@@ -88,3 +88,41 @@ func FindSystemByID(db *gorm.DB, id string) (*models.System, error) {
 	}
 	return &system, nil
 }
+
+// Systemデータをデータベースから削除する
+func DeleteSystem(db *gorm.DB, systemId string) error {
+	tx := db.Begin()
+	if tx.Error != nil {
+		return tx.Error
+	}
+
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	// システムに紐づく各LogデータのTracebackデータを削除する
+	if err := tx.Where("log_id IN (SELECT id FROM logs WHERE system_id = ?)", systemId).Delete(&models.Traceback{}).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	// システムに紐づくLogデータを削除する
+	if err := tx.Where("system_id = ?", systemId).Delete(&models.Log{}).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	// システムデータを削除する
+	if err := tx.Where("id = ?", systemId).Delete(&models.System{}).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		return err
+	}
+
+	return nil
+}

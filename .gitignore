@@ -24,3 +24,8 @@ go.work
 *wip*
 *.env
 bin
+
+# Terraform
+.terraform
+*.tfstate
+*.tfvars
