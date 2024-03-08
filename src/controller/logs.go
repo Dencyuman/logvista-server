@@ -89,7 +89,7 @@ type getLogsParams struct {
 	StartDate   *time.Time `form:"startDate"`                           // 検索する日付の開始範囲
 	EndDate     *time.Time `form:"endDate"`                             // 検索する日付の終了範囲
 	LevelName   *string    `form:"levelName"`                           // ログレベル
-	SystemName  *string    `form:"systemName"`                          // システム名
+	SystemId    *string    `form:"systemId"`                            // システムid
 	ContainsMsg *string    `form:"containMsg"`                          // メッセージ内容を含むかどうか
 	ExcType     *string    `form:"excType"`                             // エラーの種類
 	ExcDetail   *string    `form:"excDetail"`                           // エラーの詳細
@@ -111,7 +111,7 @@ type getLogsParams struct {
 // @Param startDate query string false "検索する日付の開始範囲 (形式: YYYY-MM-DDTHH:MM:SSZ)"
 // @Param endDate query string false "検索する日付の終了範囲 (形式: YYYY-MM-DDTHH:MM:SSZ)"
 // @Param levelName query string false "ログレベルでのフィルタ"
-// @Param systemName query string false "システム名でのフィルタ"
+// @Param systemId query string false "システムidでのフィルタ"
 // @Param containMsg query string false "メッセージ内容の部分一致フィルタ"
 // @Param excType query string false "エラーの種類でのフィルタ"
 // @Param excDetail query string false "エラーの詳細でのキーワード部分一致フィルタ"
@@ -128,13 +128,13 @@ func (ctrl *AppController) GetLogs(c *gin.Context) {
 
 	// クエリパラメータをオプションに変換
 	offset := (params.Page - 1) * params.PageSize
-	opts := &crud.FindLogsOptions{
+	logsOpts := &crud.QueryLogsOptions{
 		Offset:      &offset,
 		Limit:       &params.PageSize,
 		StartDate:   params.StartDate,
 		EndDate:     params.EndDate,
 		LevelName:   params.LevelName,
-		SystemName:  params.SystemName,
+		SystemId:    params.SystemId,
 		ContainsMsg: params.ContainsMsg,
 		ExcType:     params.ExcType,
 		ExcDetail:   params.ExcDetail,
@@ -143,7 +143,7 @@ func (ctrl *AppController) GetLogs(c *gin.Context) {
 	}
 
 	// オプションを指定してログを取得
-	filteredModelLogs, err := crud.FindLogs(ctrl.DB, opts)
+	filteredModelLogs, err := crud.FindLogs(ctrl.DB, logsOpts)
 	if err != nil {
 		log.Printf("Error finding logs: %v\n", err)
 		c.JSON(http.StatusInternalServerError, schemas.ErrorResponse{Message: "Internal Server Error"})
@@ -153,9 +153,9 @@ func (ctrl *AppController) GetLogs(c *gin.Context) {
 	log.Printf("Found logs count: %d\n", len(filteredModelLogs))
 
 	// オプションを変更して全件取得
-	opts.Offset = nil
-	opts.Limit = nil
-	allModelLogs, err := crud.FindLogs(ctrl.DB, opts)
+	logsOpts.Offset = nil
+	logsOpts.Limit = nil
+	foundLogCount, err := crud.CountLogs(ctrl.DB, logsOpts)
 	if err != nil {
 		log.Printf("Error finding logs: %v\n", err)
 		c.JSON(http.StatusInternalServerError, schemas.ErrorResponse{Message: "Internal Server Error"})
@@ -175,10 +175,10 @@ func (ctrl *AppController) GetLogs(c *gin.Context) {
 
 	// ページネーション用のレスポンスを作成
 	paginatedResponse := schemas.PaginatedLogResponse{
-		Total:      len(allModelLogs),
+		Total:      foundLogCount,
 		Page:       params.Page,
 		Limit:      params.PageSize,
-		TotalPages: len(allModelLogs)/params.PageSize + 1,
+		TotalPages: foundLogCount/params.PageSize + 1,
 		Items:      schemaLogs,
 	}
 	c.JSON(http.StatusOK, paginatedResponse)

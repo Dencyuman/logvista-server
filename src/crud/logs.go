@@ -47,14 +47,14 @@ func InsertLogWithTracebacks(db *gorm.DB, modelLog *models.Log) error {
 	return tx.Commit().Error // トランザクションをコミット
 }
 
-// FindLogsのオプション型
-type FindLogsOptions struct {
+// FindLogsとCountLogsのオプション型
+type QueryLogsOptions struct {
 	Limit       *int
 	Offset      *int
 	StartDate   *time.Time // 検索する日付の開始範囲
 	EndDate     *time.Time // 検索する日付の終了範囲
 	LevelName   *string    // ログレベル
-	SystemName  *string    // システム名
+	SystemId    *string    // システムID
 	ContainsMsg *string    // メッセージ内容を含むかどうか
 	ExcType     *string    // エラーの種類
 	ExcDetail   *string    // エラーの詳細
@@ -63,9 +63,9 @@ type FindLogsOptions struct {
 }
 
 // Logデータをデータベースから取得する
-func FindLogs(db *gorm.DB, opts *FindLogsOptions) ([]models.Log, error) {
+func FindLogs(db *gorm.DB, opts *QueryLogsOptions) ([]models.Log, error) {
 	if opts == nil {
-		opts = &FindLogsOptions{}
+		opts = &QueryLogsOptions{}
 	}
 
 	query := db.Table("logs").Preload("System").Preload("ExcTraceback")
@@ -90,9 +90,9 @@ func FindLogs(db *gorm.DB, opts *FindLogsOptions) ([]models.Log, error) {
 		query = query.Where("level_name = ?", *opts.LevelName)
 	}
 
-	if opts.SystemName != nil {
+	if opts.SystemId != nil {
 		query = query.Joins("JOIN systems ON systems.id = logs.system_id").
-			Where("systems.name = ?", *opts.SystemName)
+			Where("systems.id = ?", *opts.SystemId)
 	}
 
 	if opts.ContainsMsg != nil {
@@ -120,6 +120,67 @@ func FindLogs(db *gorm.DB, opts *FindLogsOptions) ([]models.Log, error) {
 		return nil, err
 	}
 	return logs, nil
+}
+
+// Logデータをデータベースから取得する
+func CountLogs(db *gorm.DB, opts *QueryLogsOptions) (int, error) {
+	if opts == nil {
+		opts = &QueryLogsOptions{}
+	}
+
+	query := db.Table("logs")
+
+	if opts.Limit != nil {
+		query = query.Limit(*opts.Limit)
+	}
+
+	if opts.Offset != nil {
+		query = query.Offset(*opts.Offset)
+	}
+
+	if opts.StartDate != nil {
+		query = query.Where("timestamp >= ?", *opts.StartDate)
+	}
+
+	if opts.EndDate != nil {
+		query = query.Where("timestamp <= ?", *opts.EndDate)
+	}
+
+	if opts.LevelName != nil {
+		query = query.Where("level_name = ?", *opts.LevelName)
+	}
+
+	if opts.SystemId != nil {
+		query = query.Joins("JOIN systems ON systems.id = logs.system_id").
+			Where("systems.id = ?", *opts.SystemId)
+	}
+
+	if opts.ContainsMsg != nil {
+		query = query.Where("message LIKE ?", "%"+*opts.ContainsMsg+"%")
+	}
+
+	if opts.ExcType != nil {
+		query = query.Where("exc_type = ?", *opts.ExcType)
+	}
+
+	if opts.ExcDetail != nil {
+		query = query.Where("exc_detail LIKE ?", "%"+*opts.ExcDetail+"%")
+	}
+
+	if opts.FileName != nil {
+		query = query.Where("file_name = ?", *opts.FileName)
+	}
+
+	if opts.Lineno != nil {
+		query = query.Where("lineno = ?", *opts.Lineno)
+	}
+
+	var CountBuffer int64
+	if err := query.Count(&CountBuffer).Error; err != nil {
+		return 0, err
+	}
+	var Count int = int(CountBuffer)
+	return Count, nil
 }
 
 // 指定したシステムの最新のログを取得する

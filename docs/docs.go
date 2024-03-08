@@ -88,8 +88,8 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
-                        "description": "システム名でのフィルタ",
-                        "name": "systemName",
+                        "description": "システムidでのフィルタ",
+                        "name": "systemId",
                         "in": "query"
                     },
                     {
