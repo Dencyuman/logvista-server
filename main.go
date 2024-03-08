@@ -14,6 +14,12 @@ import (
 	util "github.com/Dencyuman/logvista-server/src/utils"
 )
 
+// This branch's Task
+// TODO: tmplコマンドを削除する
+// TODO: [get]/log/のフィルタ条件にsystemIdを追加する
+// TODO: [get]/systems/summaryのパラメータをsystemNameからsystemIdに変更する
+// TODO: [put]/systems/{systemName}を[put]/systems/{systemId}に変更する
+
 // @title LogVista API
 // @version 0.1.13
 // @description This is LogVista server.
@@ -22,30 +28,29 @@ func main() {
 	seed := flag.Bool("seed", false, "Set to true to seed the database")
 	migrate := flag.Bool("migrate", false, "Set to true to migrate the database")
 	reset := flag.Bool("reset", false, "Set to true to reset the database")
-	tmpl := flag.Bool("tmpl", false, "Set to true to run the server in Generate Template mode")
 	flag.Parse()
 
-	if *tmpl {
-		staticDirPath := "./static/"
-		path, err := util.FindFirstJSFile(staticDirPath)
-		if err != nil {
-			log.Fatal("Failed to find JS files:", err)
-		}
-		jsFile := filepath.Base(path)
-		tmplPath := "./static/" + jsFile
-		outputPath := "./static/assets/" + jsFile
-		err = util.GenerateJSFileFromTemplate(tmplPath, outputPath)
-		if err != nil {
-			log.Fatal("Failed to generate JS file:", err)
-		}
-		return
+	// Generate JS file from template
+	staticDirPath := "./static/"
+	path, err := util.FindFirstJSFile(staticDirPath)
+	if err != nil {
+		log.Fatal("Failed to find JS files:", err)
+	}
+	jsFile := filepath.Base(path)
+	tmplPath := "./static/" + jsFile
+	outputPath := "./static/assets/" + jsFile
+	err = util.GenerateJSFileFromTemplate(tmplPath, outputPath)
+	if err != nil {
+		log.Fatal("Failed to generate JS file:", err)
 	}
 
+	// Initialize the database
 	db, err := initializeDB()
 	if err != nil {
 		log.Fatal("Failed to connect to the database:", err)
 	}
 
+	// Migrate the database (if necessary)
 	if *migrate {
 		err = database.Migrate(db)
 		if err != nil {
@@ -54,6 +59,7 @@ func main() {
 		return
 	}
 
+	// Seed the database (if necessary)
 	if *seed {
 		err = database.Seed(db)
 		if err != nil {
@@ -62,6 +68,7 @@ func main() {
 		return
 	}
 
+	// Reset the database (if necessary)
 	if *reset {
 		reader := bufio.NewReader(os.Stdin)
 		log.Println("Are you sure you want to reset the database? (y/n):")
@@ -83,6 +90,7 @@ func main() {
 		return
 	}
 
+	// Start the server
 	router := api.SetupRouter(db)
 	router.Run("0.0.0.0:" + config.AppConfig.ServerPort)
 
