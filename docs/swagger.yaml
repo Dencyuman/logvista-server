@@ -394,9 +394,9 @@ paths:
         in: query
         name: levelName
         type: string
-      - description: システム名でのフィルタ
+      - description: システムidでのフィルタ
         in: query
-        name: systemName
+        name: systemId
         type: string
       - description: メッセージ内容の部分一致フィルタ
         in: query
@@ -586,15 +586,14 @@ paths:
       summary: システム削除
       tags:
       - systems
-  /systems/{systemName}:
     put:
       consumes:
       - application/json
       description: DB上に存在するシステムを更新する
       parameters:
-      - description: システム名
+      - description: システムid
         in: path
-        name: systemName
+        name: systemId
         required: true
         type: string
       - description: Update System Request
@@ -623,9 +622,9 @@ paths:
       - application/json
       description: DB上に存在するシステム別集計情報を取得する
       parameters:
-      - description: システム名：指定しない場合は全てのシステムを取得
+      - description: システムid：指定しない場合は全てのシステムを取得
         in: query
-        name: systemName
+        name: systemId
         type: string
       - default: 3600
         description: '集計時間スパン（秒）: 10秒刻みで指定可能'
