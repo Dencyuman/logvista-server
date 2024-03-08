@@ -54,7 +54,7 @@ func (ctrl *AppController) GetSystems(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Router /systems/summary [get]
-// @Param systemName query string false "システム名：指定しない場合は全てのシステムを取得"
+// @Param systemId query string false "システムid：指定しない場合は全てのシステムを取得"
 // @Param timeSpan query int false "集計時間スパン（秒）: 10秒刻みで指定可能" minimum(10) default(3600)
 // @Param dataCount query int false "取得データ個数" minimum(1) default(12)
 // @Success 200 {object} []schemas.Summary
@@ -62,7 +62,7 @@ func (ctrl *AppController) GetSystems(c *gin.Context) {
 // @Failure 500 {object} schemas.ErrorResponse
 func (ctrl *AppController) GetSystemSummary(c *gin.Context) {
 	timeSpanParam := c.DefaultQuery("timeSpan", "3600") // デフォルトを1時間とする
-	systemName := c.Query("systemName")                 // オプショナルのシステム名
+	systemId := c.Query("systemId")                     // オプショナルのシステムid
 	dataCountParam := c.DefaultQuery("dataCount", "12") // デフォルトを12個とする
 	timeSpan, err := strconv.Atoi(timeSpanParam)
 	if err != nil {
@@ -100,8 +100,8 @@ func (ctrl *AppController) GetSystemSummary(c *gin.Context) {
 
 	var Summaries []schemas.Summary
 	var modelsSystems []models.System
-	if systemName != "" {
-		system, err := crud.FindSystemByName(ctrl.DB, systemName)
+	if systemId != "" {
+		system, err := crud.FindSystemByID(ctrl.DB, systemId)
 		if err != nil {
 			log.Printf("Error finding system by ID: %v\n", err)
 			c.JSON(http.StatusInternalServerError, schemas.ErrorResponse{Message: "Internal Server Error"})

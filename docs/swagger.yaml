@@ -623,9 +623,9 @@ paths:
       - application/json
       description: DB上に存在するシステム別集計情報を取得する
       parameters:
-      - description: システム名：指定しない場合は全てのシステムを取得
+      - description: システムid：指定しない場合は全てのシステムを取得
         in: query
-        name: systemName
+        name: systemId
         type: string
       - default: 3600
         description: '集計時間スパン（秒）: 10秒刻みで指定可能'

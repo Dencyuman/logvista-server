@@ -340,8 +340,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "システム名：指定しない場合は全てのシステムを取得",
-                        "name": "systemName",
+                        "description": "システムid：指定しない場合は全てのシステムを取得",
+                        "name": "systemId",
                         "in": "query"
                     },
                     {
