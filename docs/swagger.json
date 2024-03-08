@@ -380,6 +380,51 @@
             }
         },
         "/systems/{systemId}": {
+            "put": {
+                "description": "DB上に存在するシステムを更新する",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "systems"
+                ],
+                "summary": "システム更新",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "システムid",
+                        "name": "systemId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Update System Request",
+                        "name": "system",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/schemas.SystemRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ErrorResponse"
+                        }
+                    }
+                }
+            },
             "delete": {
                 "description": "システムとその関連ログデータを削除する",
                 "consumes": [
@@ -422,53 +467,6 @@
                     },
                     "500": {
                         "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/schemas.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/systems/{systemName}": {
-            "put": {
-                "description": "DB上に存在するシステムを更新する",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "systems"
-                ],
-                "summary": "システム更新",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "システム名",
-                        "name": "systemName",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "Update System Request",
-                        "name": "system",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/schemas.SystemRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/schemas.ErrorResponse"
                         }

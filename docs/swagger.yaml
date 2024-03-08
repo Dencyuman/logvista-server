@@ -586,15 +586,14 @@ paths:
       summary: システム削除
       tags:
       - systems
-  /systems/{systemName}:
     put:
       consumes:
       - application/json
       description: DB上に存在するシステムを更新する
       parameters:
-      - description: システム名
+      - description: システムid
         in: path
-        name: systemName
+        name: systemId
         required: true
         type: string
       - description: Update System Request

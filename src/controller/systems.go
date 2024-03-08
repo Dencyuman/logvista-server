@@ -152,18 +152,18 @@ func (ctrl *AppController) GetSystemSummary(c *gin.Context) {
 // @Tags systems
 // @Accept json
 // @Produce json
-// @Router /systems/{systemName} [put]
-// @Param systemName path string true "システム名"
+// @Router /systems/{systemId} [put]
+// @Param systemId path string true "システムid"
 // @Param system body schemas.SystemRequest true "Update System Request"
 // @Success 200 {string} string "OK"
 // @Failure 400 {object} schemas.ErrorResponse
 func (ctrl *AppController) UpdateSystem(c *gin.Context) {
-	// パスパラメータからIDを取得する
-	systemName := c.Param("systemName")
+	// パスパラメータからシステムidを取得する
+	systemId := c.Param("systemId")
 
 	// IDが提供されていない場合は、エラーメッセージを返す
-	if systemName == "" {
-		c.JSON(http.StatusBadRequest, schemas.ErrorResponse{Message: "System ID is required"})
+	if systemId == "" {
+		c.JSON(http.StatusBadRequest, schemas.ErrorResponse{Message: "systemId is required"})
 		return
 	}
 
@@ -175,7 +175,7 @@ func (ctrl *AppController) UpdateSystem(c *gin.Context) {
 	}
 
 	// パスパラメータから取得したIDを使用してシステムを見つける
-	modelsSystem, err := crud.FindSystemByName(ctrl.DB, systemName)
+	modelsSystem, err := crud.FindSystemByID(ctrl.DB, systemId)
 	if err != nil {
 		log.Printf("Error finding system by id: %v\n", err)
 		c.JSON(http.StatusInternalServerError, schemas.ErrorResponse{Message: "Internal Server Error"})

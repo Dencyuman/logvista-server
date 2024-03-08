@@ -42,7 +42,7 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 		{
 			systemsGroup.GET("/", appController.GetSystems)
 			systemsGroup.GET("/summary", appController.GetSystemSummary)
-			systemsGroup.PUT("/:systemName", appController.UpdateSystem)
+			systemsGroup.PUT("/:systemId", appController.UpdateSystem)
 			systemsGroup.DELETE("/:systemId", appController.DeleteSystem)
 		}
 	}
