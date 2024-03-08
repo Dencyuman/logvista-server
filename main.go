@@ -14,12 +14,6 @@ import (
 	util "github.com/Dencyuman/logvista-server/src/utils"
 )
 
-// This branch's Task
-// TODO: tmplコマンドを削除する
-// TODO: [get]/log/のフィルタ条件にsystemIdを追加する
-// TODO: [get]/systems/summaryのパラメータをsystemNameからsystemIdに変更する
-// TODO: [put]/systems/{systemName}を[put]/systems/{systemId}に変更する
-
 // @title LogVista API
 // @version 0.1.13
 // @description This is LogVista server.
