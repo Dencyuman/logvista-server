@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"fmt"
 	"github.com/Dencyuman/logvista-server/src/converter"
 	"github.com/Dencyuman/logvista-server/src/crud"
 	"github.com/Dencyuman/logvista-server/src/schemas"
@@ -9,6 +10,74 @@ import (
 	"log"
 	"net/http"
 )
+
+// @Summary ヘルスチェック設定取得用エンドポイント
+// @Tags healthcheck
+// @Description 200 システム別ヘルスチェック設定一覧の取得
+// @Accept json
+// @Produce json
+// @Success 200 {object} []schemas.HealthcheckConfigsResponse
+// @Failure 500 {object} schemas.ErrorResponse
+// @Router /healthcheck/configs/ [get]
+func (ctrl *AppController) GetHealthcheckConfigs(c *gin.Context) {
+	systems, err := crud.FindAllSystems(ctrl.DB)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, schemas.ErrorResponse{Message: err.Error()})
+		return
+	}
+	var healthcheckConfigsResponse []schemas.HealthcheckConfigsResponse
+	for _, system := range systems {
+		healthcheckConfigs, err := crud.FindHealthcheckConfigs(ctrl.DB, system.ID)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, schemas.ErrorResponse{Message: err.Error()})
+			return
+		}
+		healthcheckConfig := converter.ConvertHealthcheckConfigsToResponse(system, healthcheckConfigs)
+
+		healthcheckConfigsResponse = append(healthcheckConfigsResponse, healthcheckConfig)
+		fmt.Println(healthcheckConfigs)
+	}
+
+	c.JSON(http.StatusOK, healthcheckConfigsResponse)
+}
+
+// @Summary ヘルスチェック設定取得用エンドポイント(システム別)
+// @Tags healthcheck
+// @Description 200 systemIdで指定したシステムに紐づくヘルスチェック設定一覧の取得
+// @Accept json
+// @Produce json
+// @Success 200 {object} schemas.HealthcheckConfigsResponse
+// @Failure 500 {object} schemas.ErrorResponse
+// @Router /healthcheck/configs/{systemId} [get]
+// @Param systemId path string true "システムid"
+func (ctrl *AppController) GetSystemHealthcheckConfigs(c *gin.Context) {
+	// パスパラメータからIDを取得する
+	systemID := c.Param("systemId")
+
+	// IDが提供されていない場合は、エラーメッセージを返す
+	if systemID == "" {
+		c.JSON(http.StatusBadRequest, schemas.ErrorResponse{Message: "System ID is required"})
+		return
+	}
+
+	// パスパラメータから取得したIDを使用してシステムを見つける
+	modelsSystem, err := crud.FindSystemByID(ctrl.DB, systemID)
+	if err != nil {
+		log.Printf("Error finding system by id: %v\n", err)
+		c.JSON(http.StatusNotFound, schemas.ErrorResponse{Message: "System not found"})
+		return
+	}
+
+	healthcheckConfigs, err := crud.FindHealthcheckConfigs(ctrl.DB, modelsSystem.ID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, schemas.ErrorResponse{Message: err.Error()})
+		return
+	}
+	healthcheckConfigsResponse := converter.ConvertHealthcheckConfigsToResponse(*modelsSystem, healthcheckConfigs)
+	fmt.Println(healthcheckConfigs)
+
+	c.JSON(http.StatusOK, healthcheckConfigsResponse)
+}
 
 // @Summary ヘルスチェック設定テスト用エンドポイント(SiteTitle)
 // @Tags healthcheck

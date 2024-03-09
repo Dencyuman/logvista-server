@@ -5,6 +5,38 @@ definitions:
       message:
         type: string
     type: object
+  schemas.HealthcheckConfigsResponse:
+    properties:
+      category:
+        example: API Server
+        type: string
+      created_at:
+        example: "2023-01-01T00:00:00.000000+09:00"
+        type: string
+      endpoint_configs:
+        description: エンドポイントヘルスチェックの設定
+        items:
+          $ref: '#/definitions/schemas.HealthcheckEndpointConfigResponse'
+        type: array
+      id:
+        example: 00000000-0000-0000-0000-000000000000
+        type: string
+      name:
+        example: sample_system
+        type: string
+      site_title_configs:
+        description: サイトタイトルヘルスチェックの設定
+        items:
+          $ref: '#/definitions/schemas.HealthcheckSiteTitleConfigResponse'
+        type: array
+      updated_at:
+        example: "2023-01-01T00:00:00.000000+09:00"
+        type: string
+    required:
+    - created_at
+    - id
+    - updated_at
+    type: object
   schemas.HealthcheckEndpointConfigBody:
     properties:
       description:
@@ -552,6 +584,52 @@ paths:
       summary: Logvistaヘルスチェック用エンドポイント
       tags:
       - general
+  /healthcheck/configs/:
+    get:
+      consumes:
+      - application/json
+      description: 200 システム別ヘルスチェック設定一覧の取得
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/schemas.HealthcheckConfigsResponse'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+      summary: ヘルスチェック設定取得用エンドポイント
+      tags:
+      - healthcheck
+  /healthcheck/configs/{systemId}:
+    get:
+      consumes:
+      - application/json
+      description: 200 systemIdで指定したシステムに紐づくヘルスチェック設定一覧の取得
+      parameters:
+      - description: システムid
+        in: path
+        name: systemId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.HealthcheckConfigsResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+      summary: ヘルスチェック設定取得用エンドポイント(システム別)
+      tags:
+      - healthcheck
   /healthcheck/configs/endpoint:
     post:
       consumes:

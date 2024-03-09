@@ -31,6 +31,38 @@
                 }
             }
         },
+        "/healthcheck/configs/": {
+            "get": {
+                "description": "200 システム別ヘルスチェック設定一覧の取得",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "healthcheck"
+                ],
+                "summary": "ヘルスチェック設定取得用エンドポイント",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/schemas.HealthcheckConfigsResponse"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/healthcheck/configs/endpoint": {
             "post": {
                 "description": "200 Endpointヘルスチェックを設定する",
@@ -176,6 +208,44 @@
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/schemas.TestHealthcheckSiteTitleConfigResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/healthcheck/configs/{systemId}": {
+            "get": {
+                "description": "200 systemIdで指定したシステムに紐づくヘルスチェック設定一覧の取得",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "healthcheck"
+                ],
+                "summary": "ヘルスチェック設定取得用エンドポイント(システム別)",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "システムid",
+                        "name": "systemId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.HealthcheckConfigsResponse"
                         }
                     },
                     "500": {
@@ -637,6 +707,50 @@
             "properties": {
                 "message": {
                     "type": "string"
+                }
+            }
+        },
+        "schemas.HealthcheckConfigsResponse": {
+            "type": "object",
+            "required": [
+                "created_at",
+                "id",
+                "updated_at"
+            ],
+            "properties": {
+                "category": {
+                    "type": "string",
+                    "example": "API Server"
+                },
+                "created_at": {
+                    "type": "string",
+                    "example": "2023-01-01T00:00:00.000000+09:00"
+                },
+                "endpoint_configs": {
+                    "description": "エンドポイントヘルスチェックの設定",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/schemas.HealthcheckEndpointConfigResponse"
+                    }
+                },
+                "id": {
+                    "type": "string",
+                    "example": "00000000-0000-0000-0000-000000000000"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "sample_system"
+                },
+                "site_title_configs": {
+                    "description": "サイトタイトルヘルスチェックの設定",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/schemas.HealthcheckSiteTitleConfigResponse"
+                    }
+                },
+                "updated_at": {
+                    "type": "string",
+                    "example": "2023-01-01T00:00:00.000000+09:00"
                 }
             }
         },

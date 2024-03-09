@@ -71,3 +71,10 @@ type HealthcheckEndpointConfigResponse struct {
 	CreatedAt      time.Time `json:"created_at" binding:"required" example:"2023-01-01T00:00:00.000000+09:00"`    // 作成日時
 	UpdatedAt      time.Time `json:"updated_at" binding:"required" example:"2023-01-01T00:00:00.000000+09:00"`    // 更新日時
 }
+
+// swagger:response healthcheckConfigsResponse
+type HealthcheckConfigsResponse struct {
+	SystemResponse                                        // システム情報
+	SiteTitleConfigs []HealthcheckSiteTitleConfigResponse `json:"site_title_configs"` // サイトタイトルヘルスチェックの設定
+	EndpointConfigs  []HealthcheckEndpointConfigResponse  `json:"endpoint_configs"`   // エンドポイントヘルスチェックの設定
+}

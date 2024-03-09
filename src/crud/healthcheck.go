@@ -40,3 +40,11 @@ func InsertHealthcheck(db *gorm.DB, modelHealthcheckConfig *models.HealthcheckCo
 
 	return tx.Commit().Error // トランザクションをコミット
 }
+
+func FindHealthcheckConfigs(db *gorm.DB, systemID string) ([]models.HealthcheckConfig, error) {
+	var healthcheckConfigs []models.HealthcheckConfig
+	if err := db.Where("system_id = ?", systemID).Find(&healthcheckConfigs).Error; err != nil {
+		return nil, err
+	}
+	return healthcheckConfigs, nil
+}
