@@ -565,8 +565,8 @@ definitions:
     type: object
 info:
   contact: {}
-  description: This is LogVista server.
-  title: LogVista API
+  description: This is Logvista server.
+  title: Logvista API
   version: 0.1.13
 paths:
   /:

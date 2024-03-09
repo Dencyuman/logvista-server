@@ -13,9 +13,9 @@ import (
 	"strings"
 )
 
-// @title LogVista API
+// @title Logvista API
 // @version 0.1.13
-// @description This is LogVista server.
+// @description This is Logvista server.
 // @BasePath /api/v1
 func main() {
 	seed := flag.Bool("seed", false, "Set to true to seed the database")
