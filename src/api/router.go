@@ -24,7 +24,7 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 	{
 		generalGroup := v1.Group("/")
 		{
-			generalGroup.GET("/healthcheck", controller.HealthCheck)
+			generalGroup.GET("/", controller.HealthCheck)
 		}
 		logsGroup := v1.Group("/logs")
 		{
@@ -44,6 +44,13 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 			systemsGroup.GET("/summary", appController.GetSystemSummary)
 			systemsGroup.PUT("/:systemId", appController.UpdateSystem)
 			systemsGroup.DELETE("/:systemId", appController.DeleteSystem)
+		}
+		HealthcheckGroup := v1.Group("/healthcheck")
+		{
+			HealthcheckGroup.POST("/configs/site-title/test", controller.TestHealthcheckSiteTitleConfig)
+			HealthcheckGroup.POST("/configs/site-title", appController.HealthcheckSiteTitleConfig)
+			HealthcheckGroup.POST("/configs/endpoint/test", controller.TestHealthcheckEndpointConfig)
+			HealthcheckGroup.POST("/configs/endpoint", appController.HealthcheckEndpointConfig)
 		}
 	}
 

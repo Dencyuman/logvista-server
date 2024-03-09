@@ -3,15 +3,14 @@ package main
 import (
 	"bufio"
 	"flag"
+	"github.com/Dencyuman/logvista-server/config"
+	"github.com/Dencyuman/logvista-server/src/api"
+	"github.com/Dencyuman/logvista-server/src/database"
+	"github.com/Dencyuman/logvista-server/src/utils"
 	"log"
 	"os"
 	"path/filepath"
 	"strings"
-
-	"github.com/Dencyuman/logvista-server/config"
-	api "github.com/Dencyuman/logvista-server/src/api"
-	database "github.com/Dencyuman/logvista-server/src/database"
-	util "github.com/Dencyuman/logvista-server/src/utils"
 )
 
 // @title LogVista API
@@ -26,14 +25,14 @@ func main() {
 
 	// Generate JS file from template
 	staticDirPath := "./static/"
-	path, err := util.FindFirstJSFile(staticDirPath)
+	path, err := utils.FindFirstJSFile(staticDirPath)
 	if err != nil {
 		log.Fatal("Failed to find JS files:", err)
 	}
 	jsFile := filepath.Base(path)
 	tmplPath := "./static/" + jsFile
 	outputPath := "./static/assets/" + jsFile
-	err = util.GenerateJSFileFromTemplate(tmplPath, outputPath)
+	err = utils.GenerateJSFileFromTemplate(tmplPath, outputPath)
 	if err != nil {
 		log.Fatal("Failed to generate JS file:", err)
 	}
@@ -87,5 +86,4 @@ func main() {
 	// Start the server
 	router := api.SetupRouter(db)
 	router.Run("0.0.0.0:" + config.AppConfig.ServerPort)
-
 }

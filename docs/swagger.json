@@ -8,7 +8,7 @@
     },
     "basePath": "/api/v1",
     "paths": {
-        "/healthcheck": {
+        "/": {
             "get": {
                 "description": "200 OKが返ってくれば起動済み",
                 "consumes": [
@@ -20,12 +20,168 @@
                 "tags": [
                     "general"
                 ],
-                "summary": "ヘルスチェック用エンドポイント",
+                "summary": "Logvistaヘルスチェック用エンドポイント",
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/schemas.ResponseMessage"
+                        }
+                    }
+                }
+            }
+        },
+        "/healthcheck/configs/endpoint": {
+            "post": {
+                "description": "200 Endpointヘルスチェックを設定する",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "healthcheck"
+                ],
+                "summary": "ヘルスチェック設定用エンドポイント(Endpoint)",
+                "parameters": [
+                    {
+                        "description": "Endpoint用設定値",
+                        "name": "config",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.HealthcheckEndpointConfigBody"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.HealthcheckEndpointConfigResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/healthcheck/configs/endpoint/test": {
+            "post": {
+                "description": "200 設定通りにEndpointヘルスチェックを１回実行した結果を取得できる",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "healthcheck"
+                ],
+                "summary": "ヘルスチェック設定テスト用エンドポイント(Endpoint)",
+                "parameters": [
+                    {
+                        "description": "Endpoint用設定値",
+                        "name": "config",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.TestHealthcheckEndpointConfigBody"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.TestHealthcheckEndpointConfigResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/healthcheck/configs/site-title": {
+            "post": {
+                "description": "200 SiteTitleヘルスチェックを設定する",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "healthcheck"
+                ],
+                "summary": "ヘルスチェック設定用エンドポイント(SiteTitle)",
+                "parameters": [
+                    {
+                        "description": "SiteTitle用設定値",
+                        "name": "config",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.HealthcheckSiteTitleConfigBody"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.HealthcheckSiteTitleConfigResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/healthcheck/configs/site-title/test": {
+            "post": {
+                "description": "200 設定通りにSiteTitleヘルスチェックを１回実行した結果を取得できる",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "healthcheck"
+                ],
+                "summary": "ヘルスチェック設定テスト用エンドポイント(SiteTitle)",
+                "parameters": [
+                    {
+                        "description": "SiteTitle用設定値",
+                        "name": "config",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.TestHealthcheckSiteTitleConfigBody"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.TestHealthcheckSiteTitleConfigResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     }
                 }
@@ -484,6 +640,182 @@
                 }
             }
         },
+        "schemas.HealthcheckEndpointConfigBody": {
+            "type": "object",
+            "required": [
+                "system_id"
+            ],
+            "properties": {
+                "description": {
+                    "description": "設定の説明",
+                    "type": "string",
+                    "example": "sampleDescription"
+                },
+                "expexted_status": {
+                    "description": "想定ステータス",
+                    "type": "integer",
+                    "example": 200
+                },
+                "name": {
+                    "description": "設定名",
+                    "type": "string",
+                    "example": "sampleName"
+                },
+                "system_id": {
+                    "description": "システムid",
+                    "type": "string",
+                    "example": "00000000-0000-0000-0000-000000000000"
+                },
+                "timespan": {
+                    "description": "ヘルスチェック間隔(10s)",
+                    "type": "integer",
+                    "example": 10
+                },
+                "url": {
+                    "description": "アクセス先url",
+                    "type": "string",
+                    "example": "http://localhost:8080/"
+                }
+            }
+        },
+        "schemas.HealthcheckEndpointConfigResponse": {
+            "type": "object",
+            "required": [
+                "created_at",
+                "system_id",
+                "updated_at"
+            ],
+            "properties": {
+                "created_at": {
+                    "description": "作成日時",
+                    "type": "string",
+                    "example": "2023-01-01T00:00:00.000000+09:00"
+                },
+                "description": {
+                    "description": "設定の説明",
+                    "type": "string",
+                    "example": "sampleDescription"
+                },
+                "expexted_status": {
+                    "description": "想定ステータス",
+                    "type": "integer",
+                    "example": 200
+                },
+                "name": {
+                    "description": "設定名",
+                    "type": "string",
+                    "example": "sampleName"
+                },
+                "system_id": {
+                    "description": "システムid",
+                    "type": "string",
+                    "example": "00000000-0000-0000-0000-000000000000"
+                },
+                "timespan": {
+                    "description": "ヘルスチェック間隔(10s)",
+                    "type": "integer",
+                    "example": 10
+                },
+                "updated_at": {
+                    "description": "更新日時",
+                    "type": "string",
+                    "example": "2023-01-01T00:00:00.000000+09:00"
+                },
+                "url": {
+                    "description": "アクセス先url",
+                    "type": "string",
+                    "example": "http://localhost:8080/"
+                }
+            }
+        },
+        "schemas.HealthcheckSiteTitleConfigBody": {
+            "type": "object",
+            "required": [
+                "system_id"
+            ],
+            "properties": {
+                "description": {
+                    "description": "設定の説明",
+                    "type": "string",
+                    "example": "sampleDescription"
+                },
+                "expexted_title": {
+                    "description": "想定タイトル",
+                    "type": "string",
+                    "example": "sampleTitle"
+                },
+                "name": {
+                    "description": "設定名",
+                    "type": "string",
+                    "example": "sampleName"
+                },
+                "system_id": {
+                    "description": "システムid",
+                    "type": "string",
+                    "example": "00000000-0000-0000-0000-000000000000"
+                },
+                "timespan": {
+                    "description": "ヘルスチェック間隔(10s)",
+                    "type": "integer",
+                    "example": 10
+                },
+                "url": {
+                    "description": "アクセス先url",
+                    "type": "string",
+                    "example": "http://localhost:8080/"
+                }
+            }
+        },
+        "schemas.HealthcheckSiteTitleConfigResponse": {
+            "type": "object",
+            "required": [
+                "created_at",
+                "system_id",
+                "updated_at"
+            ],
+            "properties": {
+                "created_at": {
+                    "description": "作成日時",
+                    "type": "string",
+                    "example": "2023-01-01T00:00:00.000000+09:00"
+                },
+                "description": {
+                    "description": "設定の説明",
+                    "type": "string",
+                    "example": "sampleDescription"
+                },
+                "expexted_title": {
+                    "description": "想定タイトル",
+                    "type": "string",
+                    "example": "sampleTitle"
+                },
+                "name": {
+                    "description": "設定名",
+                    "type": "string",
+                    "example": "sampleName"
+                },
+                "system_id": {
+                    "description": "システムid",
+                    "type": "string",
+                    "example": "00000000-0000-0000-0000-000000000000"
+                },
+                "timespan": {
+                    "description": "ヘルスチェック間隔(10s)",
+                    "type": "integer",
+                    "example": 10
+                },
+                "updated_at": {
+                    "description": "更新日時",
+                    "type": "string",
+                    "example": "2023-01-01T00:00:00.000000+09:00"
+                },
+                "url": {
+                    "description": "アクセス先url",
+                    "type": "string",
+                    "example": "http://localhost:8080/"
+                }
+            }
+        },
         "schemas.Log": {
             "type": "object",
             "required": [
@@ -898,6 +1230,76 @@
                 "updated_at": {
                     "type": "string",
                     "example": "2023-01-01T00:00:00.000000+09:00"
+                }
+            }
+        },
+        "schemas.TestHealthcheckEndpointConfigBody": {
+            "type": "object",
+            "properties": {
+                "expexted_status": {
+                    "description": "想定ステータス",
+                    "type": "integer",
+                    "example": 200
+                },
+                "url": {
+                    "description": "アクセス先url",
+                    "type": "string",
+                    "example": "http://localhost:8080/"
+                }
+            }
+        },
+        "schemas.TestHealthcheckEndpointConfigResponse": {
+            "type": "object",
+            "properties": {
+                "expexted_status": {
+                    "description": "想定ステータス",
+                    "type": "integer",
+                    "example": 200
+                },
+                "fetched-status": {
+                    "description": "取得されたタイトル",
+                    "type": "string",
+                    "example": "sampleStatus"
+                },
+                "healthcheck_result": {
+                    "description": "ヘルスチェック結果",
+                    "type": "boolean",
+                    "example": true
+                }
+            }
+        },
+        "schemas.TestHealthcheckSiteTitleConfigBody": {
+            "type": "object",
+            "properties": {
+                "expexted_title": {
+                    "description": "想定タイトル",
+                    "type": "string",
+                    "example": "sampleTitle"
+                },
+                "url": {
+                    "description": "アクセス先url",
+                    "type": "string",
+                    "example": "http://localhost:8080/"
+                }
+            }
+        },
+        "schemas.TestHealthcheckSiteTitleConfigResponse": {
+            "type": "object",
+            "properties": {
+                "expexted_title": {
+                    "description": "想定タイトル",
+                    "type": "string",
+                    "example": "sampleTitle"
+                },
+                "fetched-title": {
+                    "description": "取得されたタイトル",
+                    "type": "string",
+                    "example": "sampleTitle"
+                },
+                "healthcheck_result": {
+                    "description": "ヘルスチェック結果",
+                    "type": "boolean",
+                    "example": true
                 }
             }
         },

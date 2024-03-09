@@ -5,6 +5,142 @@ definitions:
       message:
         type: string
     type: object
+  schemas.HealthcheckEndpointConfigBody:
+    properties:
+      description:
+        description: 設定の説明
+        example: sampleDescription
+        type: string
+      expexted_status:
+        description: 想定ステータス
+        example: 200
+        type: integer
+      name:
+        description: 設定名
+        example: sampleName
+        type: string
+      system_id:
+        description: システムid
+        example: 00000000-0000-0000-0000-000000000000
+        type: string
+      timespan:
+        description: ヘルスチェック間隔(10s)
+        example: 10
+        type: integer
+      url:
+        description: アクセス先url
+        example: http://localhost:8080/
+        type: string
+    required:
+    - system_id
+    type: object
+  schemas.HealthcheckEndpointConfigResponse:
+    properties:
+      created_at:
+        description: 作成日時
+        example: "2023-01-01T00:00:00.000000+09:00"
+        type: string
+      description:
+        description: 設定の説明
+        example: sampleDescription
+        type: string
+      expexted_status:
+        description: 想定ステータス
+        example: 200
+        type: integer
+      name:
+        description: 設定名
+        example: sampleName
+        type: string
+      system_id:
+        description: システムid
+        example: 00000000-0000-0000-0000-000000000000
+        type: string
+      timespan:
+        description: ヘルスチェック間隔(10s)
+        example: 10
+        type: integer
+      updated_at:
+        description: 更新日時
+        example: "2023-01-01T00:00:00.000000+09:00"
+        type: string
+      url:
+        description: アクセス先url
+        example: http://localhost:8080/
+        type: string
+    required:
+    - created_at
+    - system_id
+    - updated_at
+    type: object
+  schemas.HealthcheckSiteTitleConfigBody:
+    properties:
+      description:
+        description: 設定の説明
+        example: sampleDescription
+        type: string
+      expexted_title:
+        description: 想定タイトル
+        example: sampleTitle
+        type: string
+      name:
+        description: 設定名
+        example: sampleName
+        type: string
+      system_id:
+        description: システムid
+        example: 00000000-0000-0000-0000-000000000000
+        type: string
+      timespan:
+        description: ヘルスチェック間隔(10s)
+        example: 10
+        type: integer
+      url:
+        description: アクセス先url
+        example: http://localhost:8080/
+        type: string
+    required:
+    - system_id
+    type: object
+  schemas.HealthcheckSiteTitleConfigResponse:
+    properties:
+      created_at:
+        description: 作成日時
+        example: "2023-01-01T00:00:00.000000+09:00"
+        type: string
+      description:
+        description: 設定の説明
+        example: sampleDescription
+        type: string
+      expexted_title:
+        description: 想定タイトル
+        example: sampleTitle
+        type: string
+      name:
+        description: 設定名
+        example: sampleName
+        type: string
+      system_id:
+        description: システムid
+        example: 00000000-0000-0000-0000-000000000000
+        type: string
+      timespan:
+        description: ヘルスチェック間隔(10s)
+        example: 10
+        type: integer
+      updated_at:
+        description: 更新日時
+        example: "2023-01-01T00:00:00.000000+09:00"
+        type: string
+      url:
+        description: アクセス先url
+        example: http://localhost:8080/
+        type: string
+    required:
+    - created_at
+    - system_id
+    - updated_at
+    type: object
   schemas.Log:
     properties:
       attributes:
@@ -313,6 +449,58 @@ definitions:
     - id
     - updated_at
     type: object
+  schemas.TestHealthcheckEndpointConfigBody:
+    properties:
+      expexted_status:
+        description: 想定ステータス
+        example: 200
+        type: integer
+      url:
+        description: アクセス先url
+        example: http://localhost:8080/
+        type: string
+    type: object
+  schemas.TestHealthcheckEndpointConfigResponse:
+    properties:
+      expexted_status:
+        description: 想定ステータス
+        example: 200
+        type: integer
+      fetched-status:
+        description: 取得されたタイトル
+        example: sampleStatus
+        type: string
+      healthcheck_result:
+        description: ヘルスチェック結果
+        example: true
+        type: boolean
+    type: object
+  schemas.TestHealthcheckSiteTitleConfigBody:
+    properties:
+      expexted_title:
+        description: 想定タイトル
+        example: sampleTitle
+        type: string
+      url:
+        description: アクセス先url
+        example: http://localhost:8080/
+        type: string
+    type: object
+  schemas.TestHealthcheckSiteTitleConfigResponse:
+    properties:
+      expexted_title:
+        description: 想定タイトル
+        example: sampleTitle
+        type: string
+      fetched-title:
+        description: 取得されたタイトル
+        example: sampleTitle
+        type: string
+      healthcheck_result:
+        description: ヘルスチェック結果
+        example: true
+        type: boolean
+    type: object
   schemas.Traceback:
     properties:
       tb_filename:
@@ -349,7 +537,7 @@ info:
   title: LogVista API
   version: 0.1.13
 paths:
-  /healthcheck:
+  /:
     get:
       consumes:
       - application/json
@@ -361,9 +549,109 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/schemas.ResponseMessage'
-      summary: ヘルスチェック用エンドポイント
+      summary: Logvistaヘルスチェック用エンドポイント
       tags:
       - general
+  /healthcheck/configs/endpoint:
+    post:
+      consumes:
+      - application/json
+      description: 200 Endpointヘルスチェックを設定する
+      parameters:
+      - description: Endpoint用設定値
+        in: body
+        name: config
+        schema:
+          $ref: '#/definitions/schemas.HealthcheckEndpointConfigBody'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.HealthcheckEndpointConfigResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+      summary: ヘルスチェック設定用エンドポイント(Endpoint)
+      tags:
+      - healthcheck
+  /healthcheck/configs/endpoint/test:
+    post:
+      consumes:
+      - application/json
+      description: 200 設定通りにEndpointヘルスチェックを１回実行した結果を取得できる
+      parameters:
+      - description: Endpoint用設定値
+        in: body
+        name: config
+        schema:
+          $ref: '#/definitions/schemas.TestHealthcheckEndpointConfigBody'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.TestHealthcheckEndpointConfigResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+      summary: ヘルスチェック設定テスト用エンドポイント(Endpoint)
+      tags:
+      - healthcheck
+  /healthcheck/configs/site-title:
+    post:
+      consumes:
+      - application/json
+      description: 200 SiteTitleヘルスチェックを設定する
+      parameters:
+      - description: SiteTitle用設定値
+        in: body
+        name: config
+        schema:
+          $ref: '#/definitions/schemas.HealthcheckSiteTitleConfigBody'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.HealthcheckSiteTitleConfigResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+      summary: ヘルスチェック設定用エンドポイント(SiteTitle)
+      tags:
+      - healthcheck
+  /healthcheck/configs/site-title/test:
+    post:
+      consumes:
+      - application/json
+      description: 200 設定通りにSiteTitleヘルスチェックを１回実行した結果を取得できる
+      parameters:
+      - description: SiteTitle用設定値
+        in: body
+        name: config
+        schema:
+          $ref: '#/definitions/schemas.TestHealthcheckSiteTitleConfigBody'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.TestHealthcheckSiteTitleConfigResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+      summary: ヘルスチェック設定テスト用エンドポイント(SiteTitle)
+      tags:
+      - healthcheck
   /logs/:
     get:
       consumes:
