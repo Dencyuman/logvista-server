@@ -772,7 +772,7 @@ const docTemplate = `{
                     "type": "string",
                     "example": "sampleDescription"
                 },
-                "expexted_status": {
+                "expected_status": {
                     "description": "想定ステータス",
                     "type": "integer",
                     "example": 200
@@ -817,7 +817,7 @@ const docTemplate = `{
                     "type": "string",
                     "example": "sampleDescription"
                 },
-                "expexted_status": {
+                "expected_status": {
                     "description": "想定ステータス",
                     "type": "integer",
                     "example": 200
@@ -860,7 +860,7 @@ const docTemplate = `{
                     "type": "string",
                     "example": "sampleDescription"
                 },
-                "expexted_title": {
+                "expected_title": {
                     "description": "想定タイトル",
                     "type": "string",
                     "example": "sampleTitle"
@@ -905,7 +905,7 @@ const docTemplate = `{
                     "type": "string",
                     "example": "sampleDescription"
                 },
-                "expexted_title": {
+                "expected_title": {
                     "description": "想定タイトル",
                     "type": "string",
                     "example": "sampleTitle"
@@ -1357,7 +1357,7 @@ const docTemplate = `{
         "schemas.TestHealthcheckEndpointConfigBody": {
             "type": "object",
             "properties": {
-                "expexted_status": {
+                "expected_status": {
                     "description": "想定ステータス",
                     "type": "integer",
                     "example": 200
@@ -1372,7 +1372,7 @@ const docTemplate = `{
         "schemas.TestHealthcheckEndpointConfigResponse": {
             "type": "object",
             "properties": {
-                "expexted_status": {
+                "expected_status": {
                     "description": "想定ステータス",
                     "type": "integer",
                     "example": 200
@@ -1392,7 +1392,7 @@ const docTemplate = `{
         "schemas.TestHealthcheckSiteTitleConfigBody": {
             "type": "object",
             "properties": {
-                "expexted_title": {
+                "expected_title": {
                     "description": "想定タイトル",
                     "type": "string",
                     "example": "sampleTitle"
@@ -1407,7 +1407,7 @@ const docTemplate = `{
         "schemas.TestHealthcheckSiteTitleConfigResponse": {
             "type": "object",
             "properties": {
-                "expexted_title": {
+                "expected_title": {
                     "description": "想定タイトル",
                     "type": "string",
                     "example": "sampleTitle"

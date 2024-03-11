@@ -43,7 +43,7 @@ definitions:
         description: 設定の説明
         example: sampleDescription
         type: string
-      expexted_status:
+      expected_status:
         description: 想定ステータス
         example: 200
         type: integer
@@ -76,7 +76,7 @@ definitions:
         description: 設定の説明
         example: sampleDescription
         type: string
-      expexted_status:
+      expected_status:
         description: 想定ステータス
         example: 200
         type: integer
@@ -111,7 +111,7 @@ definitions:
         description: 設定の説明
         example: sampleDescription
         type: string
-      expexted_title:
+      expected_title:
         description: 想定タイトル
         example: sampleTitle
         type: string
@@ -144,7 +144,7 @@ definitions:
         description: 設定の説明
         example: sampleDescription
         type: string
-      expexted_title:
+      expected_title:
         description: 想定タイトル
         example: sampleTitle
         type: string
@@ -483,7 +483,7 @@ definitions:
     type: object
   schemas.TestHealthcheckEndpointConfigBody:
     properties:
-      expexted_status:
+      expected_status:
         description: 想定ステータス
         example: 200
         type: integer
@@ -494,7 +494,7 @@ definitions:
     type: object
   schemas.TestHealthcheckEndpointConfigResponse:
     properties:
-      expexted_status:
+      expected_status:
         description: 想定ステータス
         example: 200
         type: integer
@@ -509,7 +509,7 @@ definitions:
     type: object
   schemas.TestHealthcheckSiteTitleConfigBody:
     properties:
-      expexted_title:
+      expected_title:
         description: 想定タイトル
         example: sampleTitle
         type: string
@@ -520,7 +520,7 @@ definitions:
     type: object
   schemas.TestHealthcheckSiteTitleConfigResponse:
     properties:
-      expexted_title:
+      expected_title:
         description: 想定タイトル
         example: sampleTitle
         type: string

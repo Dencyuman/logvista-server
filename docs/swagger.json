@@ -765,7 +765,7 @@
                     "type": "string",
                     "example": "sampleDescription"
                 },
-                "expexted_status": {
+                "expected_status": {
                     "description": "想定ステータス",
                     "type": "integer",
                     "example": 200
@@ -810,7 +810,7 @@
                     "type": "string",
                     "example": "sampleDescription"
                 },
-                "expexted_status": {
+                "expected_status": {
                     "description": "想定ステータス",
                     "type": "integer",
                     "example": 200
@@ -853,7 +853,7 @@
                     "type": "string",
                     "example": "sampleDescription"
                 },
-                "expexted_title": {
+                "expected_title": {
                     "description": "想定タイトル",
                     "type": "string",
                     "example": "sampleTitle"
@@ -898,7 +898,7 @@
                     "type": "string",
                     "example": "sampleDescription"
                 },
-                "expexted_title": {
+                "expected_title": {
                     "description": "想定タイトル",
                     "type": "string",
                     "example": "sampleTitle"
@@ -1350,7 +1350,7 @@
         "schemas.TestHealthcheckEndpointConfigBody": {
             "type": "object",
             "properties": {
-                "expexted_status": {
+                "expected_status": {
                     "description": "想定ステータス",
                     "type": "integer",
                     "example": 200
@@ -1365,7 +1365,7 @@
         "schemas.TestHealthcheckEndpointConfigResponse": {
             "type": "object",
             "properties": {
-                "expexted_status": {
+                "expected_status": {
                     "description": "想定ステータス",
                     "type": "integer",
                     "example": 200
@@ -1385,7 +1385,7 @@
         "schemas.TestHealthcheckSiteTitleConfigBody": {
             "type": "object",
             "properties": {
-                "expexted_title": {
+                "expected_title": {
                     "description": "想定タイトル",
                     "type": "string",
                     "example": "sampleTitle"
@@ -1400,7 +1400,7 @@
         "schemas.TestHealthcheckSiteTitleConfigResponse": {
             "type": "object",
             "properties": {
-                "expexted_title": {
+                "expected_title": {
                     "description": "想定タイトル",
                     "type": "string",
                     "example": "sampleTitle"
