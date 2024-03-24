@@ -190,12 +190,71 @@ func seedLogTable(db *gorm.DB) error {
 	return tx.Commit().Error
 }
 
+func seedHealthcheckConfig(db *gorm.DB) error {
+	systemIDs, err := getAllSystemIDs(db)
+	if err != nil {
+		return err
+	}
+	if len(systemIDs) == 0 {
+		return fmt.Errorf("no systems found to attach healthcheck configs")
+	}
+
+	seedTargetSystemId := systemIDs[0]
+
+	// HealthcheckConfigエントリのサンプル
+	configs := []models.HealthcheckConfig{
+		{
+			SystemID:      seedTargetSystemId,
+			Name:          "Logvistaのタイトルチェック",
+			Description:   "Logvistaのトップページのタイトルが正しいかどうかをチェックします。",
+			ConfigType:    models.SiteTitle,
+			ExpectedValue: "Logvista",
+			Url:           "https://localhost:8080",
+			Timespan:      60, // 60分間隔でチェック
+			Note:          "",
+		},
+		{
+			SystemID:      seedTargetSystemId,
+			Name:          "Logvista APIエンドポイントの応答確認",
+			Description:   "Logvista APIエンドポイントが期待通りに応答するかをチェックします。",
+			ConfigType:    models.Endpoint,
+			ExpectedValue: "期待される応答の内容",
+			Url:           "https://api.example.com/health",
+			Timespan:      10, // 10分間隔でチェック
+			Note:          "APIエンドポイントのヘルスチェックに関する注意事項",
+		},
+	}
+
+	tx := db.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	if err := tx.Error; err != nil {
+		return err
+	}
+
+	for _, config := range configs {
+		if err := tx.Create(&config).Error; err != nil {
+			tx.Rollback()
+			return err
+		}
+	}
+
+	return tx.Commit().Error
+}
+
 // 全てのSeedingを実行する
 func Seed(db *gorm.DB) error {
 	if err := seedSystemTable(db); err != nil {
 		return err
 	}
 	if err := seedLogTable(db); err != nil {
+		return err
+	}
+	if err := seedHealthcheckConfig(db); err != nil {
 		return err
 	}
 	return nil

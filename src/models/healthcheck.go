@@ -32,3 +32,16 @@ func (h *HealthcheckConfig) BeforeCreate(tx *gorm.DB) (err error) {
 	h.ID = uuid.New().String()
 	return
 }
+
+type HealthcheckLog struct {
+	ID            string    `gorm:"type:uuid;primaryKey" json:"id"`
+	IsAlive       bool      `json:"is_alive"`
+	ResponseValue string    `json:"response_value"`
+	CreatedAt     time.Time `gorm:"autoCreateTime"`
+	UpdatedAt     time.Time `gorm:"autoUpdateTime"`
+}
+
+func (hl *HealthcheckLog) BeforeCreate(tx *gorm.DB) (err error) {
+	hl.ID = uuid.New().String()
+	return
+}

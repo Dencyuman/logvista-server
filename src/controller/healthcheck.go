@@ -2,10 +2,10 @@ package controller
 
 import (
 	"fmt"
+	"github.com/Dencyuman/logvista-server/src/background"
 	"github.com/Dencyuman/logvista-server/src/converter"
 	"github.com/Dencyuman/logvista-server/src/crud"
 	"github.com/Dencyuman/logvista-server/src/schemas"
-	"github.com/Dencyuman/logvista-server/src/utils"
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
@@ -96,7 +96,7 @@ func TestHealthcheckSiteTitleConfig(c *gin.Context) {
 		return
 	}
 
-	fetchedTitle, err := utils.FetchPageTitle(config.Url)
+	fetchedTitle, err := background.FetchPageTitle(config.Url)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, schemas.ErrorResponse{Message: err.Error()})
 		return
@@ -126,7 +126,7 @@ func TestHealthcheckEndpointConfig(c *gin.Context) {
 		return
 	}
 
-	fetchedStatus, err := utils.FetchStatusCode(config.Url)
+	fetchedStatus, err := background.FetchStatusCode(config.Url)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, schemas.ErrorResponse{Message: err.Error()})
 		return
