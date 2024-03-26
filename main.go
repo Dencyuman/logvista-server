@@ -3,8 +3,10 @@ package main
 import (
 	"bufio"
 	"flag"
+	"fmt"
 	"github.com/Dencyuman/logvista-server/config"
 	"github.com/Dencyuman/logvista-server/src/api"
+	"github.com/Dencyuman/logvista-server/src/background"
 	"github.com/Dencyuman/logvista-server/src/database"
 	"github.com/Dencyuman/logvista-server/src/utils"
 	"log"
@@ -83,7 +85,9 @@ func main() {
 		return
 	}
 
+	background.SetupServerChecker(db)
 	// Start the server
+	fmt.Printf("Starting server on port %s...\n", config.AppConfig.ServerPort)
 	router := api.SetupRouter(db)
 	router.Run("0.0.0.0:" + config.AppConfig.ServerPort)
 }

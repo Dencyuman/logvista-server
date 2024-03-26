@@ -209,19 +209,19 @@ func seedHealthcheckConfig(db *gorm.DB) error {
 			Description:   "Logvistaのトップページのタイトルが正しいかどうかをチェックします。",
 			ConfigType:    models.SiteTitle,
 			ExpectedValue: "Logvista",
-			Url:           "https://localhost:8080",
-			Timespan:      60, // 60分間隔でチェック
+			Url:           "http://localhost:8080",
 			Note:          "",
+			IsActive:      true,
 		},
 		{
 			SystemID:      seedTargetSystemId,
 			Name:          "Logvista APIエンドポイントの応答確認",
 			Description:   "Logvista APIエンドポイントが期待通りに応答するかをチェックします。",
 			ConfigType:    models.Endpoint,
-			ExpectedValue: "期待される応答の内容",
-			Url:           "https://api.example.com/health",
-			Timespan:      10, // 10分間隔でチェック
-			Note:          "APIエンドポイントのヘルスチェックに関する注意事項",
+			ExpectedValue: "Logvista API Server is running!",
+			Url:           "http://localhost:8080/api/v1/",
+			Note:          "",
+			IsActive:      true,
 		},
 	}
 

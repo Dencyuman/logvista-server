@@ -49,6 +49,14 @@ func FindHealthcheckConfigs(db *gorm.DB, systemID string) ([]models.HealthcheckC
 	return healthcheckConfigs, nil
 }
 
+func FindAllActiveHealthcheckConfigs(db *gorm.DB) ([]models.HealthcheckConfig, error) {
+	var healthcheckConfigs []models.HealthcheckConfig
+	if err := db.Where("is_active = ?", true).Find(&healthcheckConfigs).Error; err != nil {
+		return nil, err
+	}
+	return healthcheckConfigs, nil
+}
+
 // InsertHealthcheckLog は新しいHealthcheckLogエントリをデータベースに挿入します。
 func InsertHealthcheckLog(db *gorm.DB, hl *models.HealthcheckLog) error {
 	err := db.Create(hl).Error

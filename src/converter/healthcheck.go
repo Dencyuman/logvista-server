@@ -1,11 +1,8 @@
 package converter
 
 import (
-	"fmt"
 	"github.com/Dencyuman/logvista-server/src/models"
 	"github.com/Dencyuman/logvista-server/src/schemas"
-	"log"
-	"strconv"
 )
 
 // schemas.HealthcheckSiteTitleConfigBodyをmodels.HealthcheckConfigに変換
@@ -20,7 +17,7 @@ func ConvertHealthcheckSiteTitleConfigBodyToModel(body *schemas.HealthcheckSiteT
 		ConfigType:    models.SiteTitle,
 		ExpectedValue: body.ExpectedTitle,
 		Url:           body.Url,
-		Timespan:      body.Timespan,
+		IsActive:      body.IsActive,
 	}
 }
 
@@ -34,9 +31,9 @@ func ConvertHealthcheckEndpointConfigBodyToModel(body *schemas.HealthcheckEndpoi
 		Name:          body.Name,
 		Description:   body.Description,
 		ConfigType:    models.Endpoint,
-		ExpectedValue: fmt.Sprintf("%d", body.ExpectedStatus),
+		ExpectedValue: body.ExpectedResponse,
 		Url:           body.Url,
-		Timespan:      body.Timespan,
+		IsActive:      body.IsActive,
 	}
 }
 
@@ -51,7 +48,7 @@ func ConvertModelToHealthcheckSiteTitleConfigResponse(model *models.HealthcheckC
 		Description:   model.Description,
 		ExpectedTitle: model.ExpectedValue,
 		Url:           model.Url,
-		Timespan:      model.Timespan,
+		IsActive:      model.IsActive,
 		CreatedAt:     model.CreatedAt,
 		UpdatedAt:     model.UpdatedAt,
 	}
@@ -62,16 +59,15 @@ func ConvertModelToHealthcheckEndpointConfigResponse(model *models.HealthcheckCo
 	if model == nil {
 		return nil
 	}
-	expectedStatus, _ := strconv.Atoi(model.ExpectedValue) // Convert ExpectedValue string to int
 	return &schemas.HealthcheckEndpointConfigResponse{
-		SystemID:       model.SystemID,
-		Name:           model.Name,
-		Description:    model.Description,
-		ExpectedStatus: expectedStatus,
-		Url:            model.Url,
-		Timespan:       model.Timespan,
-		CreatedAt:      model.CreatedAt,
-		UpdatedAt:      model.UpdatedAt,
+		SystemID:         model.SystemID,
+		Name:             model.Name,
+		Description:      model.Description,
+		ExpectedResponse: model.ExpectedValue,
+		Url:              model.Url,
+		IsActive:         model.IsActive,
+		CreatedAt:        model.CreatedAt,
+		UpdatedAt:        model.UpdatedAt,
 	}
 }
 
@@ -89,26 +85,20 @@ func ConvertHealthcheckConfigsToResponse(system models.System, configs []models.
 				Description:   config.Description,
 				ExpectedTitle: config.ExpectedValue,
 				Url:           config.Url,
-				Timespan:      config.Timespan,
+				IsActive:      config.IsActive,
 				CreatedAt:     config.CreatedAt,
 				UpdatedAt:     config.UpdatedAt,
 			})
 		case models.Endpoint:
-			// strconv.Atoiを使用してExpectedValueを整数に変換
-			expectedStatus, err := strconv.Atoi(config.ExpectedValue)
-			if err != nil {
-				log.Printf("Error converting ExpectedValue '%s' to int for system ID '%s': %v\n", config.ExpectedValue, config.SystemID, err)
-				expectedStatus = 0 // エラーがある場合のデフォルト値
-			}
 			endpointConfigs = append(endpointConfigs, schemas.HealthcheckEndpointConfigResponse{
-				SystemID:       config.SystemID,
-				Name:           config.Name,
-				Description:    config.Description,
-				ExpectedStatus: expectedStatus,
-				Url:            config.Url,
-				Timespan:       config.Timespan,
-				CreatedAt:      config.CreatedAt,
-				UpdatedAt:      config.UpdatedAt,
+				SystemID:         config.SystemID,
+				Name:             config.Name,
+				Description:      config.Description,
+				ExpectedResponse: config.ExpectedValue,
+				Url:              config.Url,
+				IsActive:         config.IsActive,
+				CreatedAt:        config.CreatedAt,
+				UpdatedAt:        config.UpdatedAt,
 			})
 		}
 	}

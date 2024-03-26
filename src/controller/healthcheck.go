@@ -126,7 +126,7 @@ func TestHealthcheckEndpointConfig(c *gin.Context) {
 		return
 	}
 
-	fetchedStatus, err := background.FetchStatusCode(config.Url)
+	response, err := background.FetchHealthcheckAPIResponseAsString(config.Url)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, schemas.ErrorResponse{Message: err.Error()})
 		return
@@ -134,8 +134,8 @@ func TestHealthcheckEndpointConfig(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"expected_title":     config.ExpectedStatus,
-		"fetched_title":      fetchedStatus,
-		"healthcheck_result": fetchedStatus == config.ExpectedStatus,
+		"fetched_title":      response,
+		"healthcheck_result": response == config.ExpectedStatus,
 	})
 }
 

@@ -22,7 +22,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "produces": [
-                    "application/json"
+                    "text/plain"
                 ],
                 "tags": [
                     "general"
@@ -30,9 +30,9 @@ const docTemplate = `{
                 "summary": "Logvistaヘルスチェック用エンドポイント",
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Logvista API Server is running!",
                         "schema": {
-                            "$ref": "#/definitions/schemas.ResponseMessage"
+                            "type": "string"
                         }
                     }
                 }
@@ -772,10 +772,15 @@ const docTemplate = `{
                     "type": "string",
                     "example": "sampleDescription"
                 },
-                "expected_status": {
-                    "description": "想定ステータス",
-                    "type": "integer",
-                    "example": 200
+                "expected_response": {
+                    "description": "想定レスポンス",
+                    "type": "string",
+                    "example": "sampleSystem API Server is running!"
+                },
+                "is_active": {
+                    "description": "有効かどうか",
+                    "type": "boolean",
+                    "example": true
                 },
                 "name": {
                     "description": "設定名",
@@ -786,11 +791,6 @@ const docTemplate = `{
                     "description": "システムid",
                     "type": "string",
                     "example": "00000000-0000-0000-0000-000000000000"
-                },
-                "timespan": {
-                    "description": "ヘルスチェック間隔(10s)",
-                    "type": "integer",
-                    "example": 10
                 },
                 "url": {
                     "description": "アクセス先url",
@@ -817,10 +817,15 @@ const docTemplate = `{
                     "type": "string",
                     "example": "sampleDescription"
                 },
-                "expected_status": {
-                    "description": "想定ステータス",
-                    "type": "integer",
-                    "example": 200
+                "expected_response": {
+                    "description": "想定レスポンス",
+                    "type": "string",
+                    "example": "sampleSystem API Server is running!"
+                },
+                "is_active": {
+                    "description": "有効かどうか",
+                    "type": "boolean",
+                    "example": true
                 },
                 "name": {
                     "description": "設定名",
@@ -831,11 +836,6 @@ const docTemplate = `{
                     "description": "システムid",
                     "type": "string",
                     "example": "00000000-0000-0000-0000-000000000000"
-                },
-                "timespan": {
-                    "description": "ヘルスチェック間隔(10s)",
-                    "type": "integer",
-                    "example": 10
                 },
                 "updated_at": {
                     "description": "更新日時",
@@ -865,6 +865,11 @@ const docTemplate = `{
                     "type": "string",
                     "example": "sampleTitle"
                 },
+                "is_active": {
+                    "description": "有効かどうか",
+                    "type": "boolean",
+                    "example": true
+                },
                 "name": {
                     "description": "設定名",
                     "type": "string",
@@ -874,11 +879,6 @@ const docTemplate = `{
                     "description": "システムid",
                     "type": "string",
                     "example": "00000000-0000-0000-0000-000000000000"
-                },
-                "timespan": {
-                    "description": "ヘルスチェック間隔(10s)",
-                    "type": "integer",
-                    "example": 10
                 },
                 "url": {
                     "description": "アクセス先url",
@@ -910,6 +910,11 @@ const docTemplate = `{
                     "type": "string",
                     "example": "sampleTitle"
                 },
+                "is_active": {
+                    "description": "有効かどうか",
+                    "type": "boolean",
+                    "example": true
+                },
                 "name": {
                     "description": "設定名",
                     "type": "string",
@@ -919,11 +924,6 @@ const docTemplate = `{
                     "description": "システムid",
                     "type": "string",
                     "example": "00000000-0000-0000-0000-000000000000"
-                },
-                "timespan": {
-                    "description": "ヘルスチェック間隔(10s)",
-                    "type": "integer",
-                    "example": 10
                 },
                 "updated_at": {
                     "description": "更新日時",
@@ -1239,14 +1239,6 @@ const docTemplate = `{
                 }
             }
         },
-        "schemas.ResponseMessage": {
-            "type": "object",
-            "properties": {
-                "message": {
-                    "type": "string"
-                }
-            }
-        },
         "schemas.Summary": {
             "type": "object",
             "required": [
@@ -1358,9 +1350,9 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "expected_status": {
-                    "description": "想定ステータス",
-                    "type": "integer",
-                    "example": 200
+                    "description": "想定レスポンス",
+                    "type": "string",
+                    "example": "sampleSystem API Server is running!"
                 },
                 "url": {
                     "description": "アクセス先url",
@@ -1373,9 +1365,9 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "expected_status": {
-                    "description": "想定ステータス",
-                    "type": "integer",
-                    "example": 200
+                    "description": "想定レスポンス",
+                    "type": "string",
+                    "example": "sampleSystem API Server is running!"
                 },
                 "fetched-status": {
                     "description": "取得されたタイトル",

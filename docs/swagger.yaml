@@ -43,10 +43,14 @@ definitions:
         description: 設定の説明
         example: sampleDescription
         type: string
-      expected_status:
-        description: 想定ステータス
-        example: 200
-        type: integer
+      expected_response:
+        description: 想定レスポンス
+        example: sampleSystem API Server is running!
+        type: string
+      is_active:
+        description: 有効かどうか
+        example: true
+        type: boolean
       name:
         description: 設定名
         example: sampleName
@@ -55,10 +59,6 @@ definitions:
         description: システムid
         example: 00000000-0000-0000-0000-000000000000
         type: string
-      timespan:
-        description: ヘルスチェック間隔(10s)
-        example: 10
-        type: integer
       url:
         description: アクセス先url
         example: http://localhost:8080/
@@ -76,10 +76,14 @@ definitions:
         description: 設定の説明
         example: sampleDescription
         type: string
-      expected_status:
-        description: 想定ステータス
-        example: 200
-        type: integer
+      expected_response:
+        description: 想定レスポンス
+        example: sampleSystem API Server is running!
+        type: string
+      is_active:
+        description: 有効かどうか
+        example: true
+        type: boolean
       name:
         description: 設定名
         example: sampleName
@@ -88,10 +92,6 @@ definitions:
         description: システムid
         example: 00000000-0000-0000-0000-000000000000
         type: string
-      timespan:
-        description: ヘルスチェック間隔(10s)
-        example: 10
-        type: integer
       updated_at:
         description: 更新日時
         example: "2023-01-01T00:00:00.000000+09:00"
@@ -115,6 +115,10 @@ definitions:
         description: 想定タイトル
         example: sampleTitle
         type: string
+      is_active:
+        description: 有効かどうか
+        example: true
+        type: boolean
       name:
         description: 設定名
         example: sampleName
@@ -123,10 +127,6 @@ definitions:
         description: システムid
         example: 00000000-0000-0000-0000-000000000000
         type: string
-      timespan:
-        description: ヘルスチェック間隔(10s)
-        example: 10
-        type: integer
       url:
         description: アクセス先url
         example: http://localhost:8080/
@@ -148,6 +148,10 @@ definitions:
         description: 想定タイトル
         example: sampleTitle
         type: string
+      is_active:
+        description: 有効かどうか
+        example: true
+        type: boolean
       name:
         description: 設定名
         example: sampleName
@@ -156,10 +160,6 @@ definitions:
         description: システムid
         example: 00000000-0000-0000-0000-000000000000
         type: string
-      timespan:
-        description: ヘルスチェック間隔(10s)
-        example: 10
-        type: integer
       updated_at:
         description: 更新日時
         example: "2023-01-01T00:00:00.000000+09:00"
@@ -398,11 +398,6 @@ definitions:
         example: 10
         type: integer
     type: object
-  schemas.ResponseMessage:
-    properties:
-      message:
-        type: string
-    type: object
   schemas.Summary:
     properties:
       category:
@@ -484,9 +479,9 @@ definitions:
   schemas.TestHealthcheckEndpointConfigBody:
     properties:
       expected_status:
-        description: 想定ステータス
-        example: 200
-        type: integer
+        description: 想定レスポンス
+        example: sampleSystem API Server is running!
+        type: string
       url:
         description: アクセス先url
         example: http://localhost:8080/
@@ -495,9 +490,9 @@ definitions:
   schemas.TestHealthcheckEndpointConfigResponse:
     properties:
       expected_status:
-        description: 想定ステータス
-        example: 200
-        type: integer
+        description: 想定レスポンス
+        example: sampleSystem API Server is running!
+        type: string
       fetched-status:
         description: 取得されたタイトル
         example: sampleStatus
@@ -575,12 +570,12 @@ paths:
       - application/json
       description: 200 OKが返ってくれば起動済み
       produces:
-      - application/json
+      - text/plain
       responses:
         "200":
-          description: OK
+          description: Logvista API Server is running!
           schema:
-            $ref: '#/definitions/schemas.ResponseMessage'
+            type: string
       summary: Logvistaヘルスチェック用エンドポイント
       tags:
       - general
