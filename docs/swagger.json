@@ -219,7 +219,7 @@
                 }
             }
         },
-        "/healthcheck/configs/{systemId}": {
+        "/healthcheck/configs/systems/{systemId}": {
             "get": {
                 "description": "200 systemIdで指定したシステムに紐づくヘルスチェック設定一覧の取得",
                 "consumes": [
@@ -246,6 +246,61 @@
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/schemas.HealthcheckConfigsResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/healthcheck/configs/{configId}/logs": {
+            "get": {
+                "description": "200 ヘルスチェックログ一覧の取得",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "healthcheck"
+                ],
+                "summary": "ヘルスチェックログ取得用エンドポイント",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "設定ID",
+                        "name": "configId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "取得ログデータ件数",
+                        "name": "count",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "default": true,
+                        "description": "降順フラグ",
+                        "name": "desc",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/schemas.HealthcheckLogsListResponse"
+                            }
                         }
                     },
                     "500": {
@@ -710,6 +765,61 @@
                 }
             }
         },
+        "schemas.HealthcheckConfigResponse": {
+            "type": "object",
+            "properties": {
+                "config_type": {
+                    "description": "設定タイプ",
+                    "type": "string",
+                    "example": "SiteTitle"
+                },
+                "created_at": {
+                    "description": "作成日時",
+                    "type": "string",
+                    "example": "2023-01-01T00:00:00.000000+09:00"
+                },
+                "description": {
+                    "description": "設定の説明",
+                    "type": "string",
+                    "example": "sampleDescription"
+                },
+                "expected_value": {
+                    "description": "想定値",
+                    "type": "string",
+                    "example": "sampleValue"
+                },
+                "id": {
+                    "description": "設定ID",
+                    "type": "string",
+                    "example": "00000000-0000-0000-0000-000000000000"
+                },
+                "is_active": {
+                    "description": "有効かどうか",
+                    "type": "boolean",
+                    "example": true
+                },
+                "name": {
+                    "description": "設定名",
+                    "type": "string",
+                    "example": "sampleName"
+                },
+                "system_id": {
+                    "description": "システムID",
+                    "type": "string",
+                    "example": "00000000-0000-0000-0000-000000000000"
+                },
+                "updated_at": {
+                    "description": "更新日時",
+                    "type": "string",
+                    "example": "2023-01-01T00:00:00.000000+09:00"
+                },
+                "url": {
+                    "description": "アクセス先url",
+                    "type": "string",
+                    "example": "http://localhost:8080/"
+                }
+            }
+        },
         "schemas.HealthcheckConfigsResponse": {
             "type": "object",
             "required": [
@@ -815,6 +925,11 @@
                     "type": "string",
                     "example": "sampleSystem API Server is running!"
                 },
+                "id": {
+                    "description": "ログID",
+                    "type": "string",
+                    "example": "00000000-0000-0000-0000-000000000000"
+                },
                 "is_active": {
                     "description": "有効かどうか",
                     "type": "boolean",
@@ -839,6 +954,61 @@
                     "description": "アクセス先url",
                     "type": "string",
                     "example": "http://localhost:8080/"
+                }
+            }
+        },
+        "schemas.HealthcheckLogsListResponse": {
+            "type": "object",
+            "properties": {
+                "config": {
+                    "description": "ヘルスチェック設定",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/schemas.HealthcheckConfigResponse"
+                        }
+                    ]
+                },
+                "logs": {
+                    "description": "ログリスト",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/schemas.HealthcheckLogsResponse"
+                    }
+                }
+            }
+        },
+        "schemas.HealthcheckLogsResponse": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "description": "作成日時",
+                    "type": "string",
+                    "example": "2023-01-01T00:00:00.000000+09:00"
+                },
+                "healthcheck_config_id": {
+                    "description": "ヘルスチェック設定ID",
+                    "type": "string",
+                    "example": "00000000-0000-0000-0000-000000000000"
+                },
+                "id": {
+                    "description": "ログID",
+                    "type": "string",
+                    "example": "00000000-0000-0000-0000-000000000000"
+                },
+                "is_alive": {
+                    "description": "ヘルスチェック結果",
+                    "type": "boolean",
+                    "example": true
+                },
+                "response_value": {
+                    "description": "レスポンス値",
+                    "type": "string",
+                    "example": "sampleResponse"
+                },
+                "updated_at": {
+                    "description": "更新日時",
+                    "type": "string",
+                    "example": "2023-01-01T00:00:00.000000+09:00"
                 }
             }
         },
@@ -902,6 +1072,11 @@
                     "description": "想定タイトル",
                     "type": "string",
                     "example": "sampleTitle"
+                },
+                "id": {
+                    "description": "ログID",
+                    "type": "string",
+                    "example": "00000000-0000-0000-0000-000000000000"
                 },
                 "is_active": {
                     "description": "有効かどうか",

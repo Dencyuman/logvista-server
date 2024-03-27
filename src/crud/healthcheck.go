@@ -8,6 +8,7 @@ import (
 	"strings"
 )
 
+// InsertHealthcheck は新しいHealthcheckConfigエントリをデータベースに挿入します。
 func InsertHealthcheck(db *gorm.DB, modelHealthcheckConfig *models.HealthcheckConfig) error {
 	if modelHealthcheckConfig == nil {
 		return errors.New("received nil healthcheck config data")
@@ -41,6 +42,7 @@ func InsertHealthcheck(db *gorm.DB, modelHealthcheckConfig *models.HealthcheckCo
 	return tx.Commit().Error // トランザクションをコミット
 }
 
+// FindHealthcheckConfigs は指定されたシステムに関連付けられたHealthcheckConfigエントリをデータベースから取得します。
 func FindHealthcheckConfigs(db *gorm.DB, systemID string) ([]models.HealthcheckConfig, error) {
 	var healthcheckConfigs []models.HealthcheckConfig
 	if err := db.Where("system_id = ?", systemID).Find(&healthcheckConfigs).Error; err != nil {
@@ -49,6 +51,7 @@ func FindHealthcheckConfigs(db *gorm.DB, systemID string) ([]models.HealthcheckC
 	return healthcheckConfigs, nil
 }
 
+// FindAllActiveHealthcheckConfigs はデータベースからすべてのアクティブなHealthcheckConfigエントリを取得します。
 func FindAllActiveHealthcheckConfigs(db *gorm.DB) ([]models.HealthcheckConfig, error) {
 	var healthcheckConfigs []models.HealthcheckConfig
 	if err := db.Where("is_active = ?", true).Find(&healthcheckConfigs).Error; err != nil {
@@ -66,10 +69,34 @@ func InsertHealthcheckLog(db *gorm.DB, hl *models.HealthcheckLog) error {
 	return nil
 }
 
-func FindHealthcheckLogs(db *gorm.DB, systemID string) ([]models.HealthcheckLog, error) {
+// FindHealthcheckLogs は指定されたHealthcheckConfigに関連付けられたHealthcheckLogエントリをデータベースから取得します。
+// count は取得するログの最大件数を指定します。desc が true の場合は結果を降順にソートします。
+func FindHealthcheckLogs(db *gorm.DB, configID string, count int, desc bool) ([]models.HealthcheckLog, error) {
 	var healthcheckLogs []models.HealthcheckLog
-	if err := db.Where("system_id = ?", systemID).Find(&healthcheckLogs).Error; err != nil {
+	query := db.Where("healthcheck_config_id = ?", configID)
+
+	if desc {
+		query = query.Order("created_at DESC")
+	} else {
+		query = query.Order("created_at ASC")
+	}
+
+	if count > 0 {
+		query = query.Limit(count)
+	}
+
+	if err := query.Find(&healthcheckLogs).Error; err != nil {
 		return nil, err
 	}
+
 	return healthcheckLogs, nil
+}
+
+// FindHealthcheckConfigByID は指定されたIDに一致するHealthcheckConfigエントリをデータベースから取得します。
+func FindHealthcheckConfigByID(db *gorm.DB, id string) (*models.HealthcheckConfig, error) {
+	var healthcheckConfig models.HealthcheckConfig
+	if err := db.Where("id = ?", id).First(&healthcheckConfig).Error; err != nil {
+		return nil, err
+	}
+	return &healthcheckConfig, nil
 }

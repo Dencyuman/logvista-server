@@ -43,6 +43,7 @@ func ConvertModelToHealthcheckSiteTitleConfigResponse(model *models.HealthcheckC
 		return nil
 	}
 	return &schemas.HealthcheckSiteTitleConfigResponse{
+		ID:            model.ID,
 		SystemID:      model.SystemID,
 		Name:          model.Name,
 		Description:   model.Description,
@@ -60,6 +61,7 @@ func ConvertModelToHealthcheckEndpointConfigResponse(model *models.HealthcheckCo
 		return nil
 	}
 	return &schemas.HealthcheckEndpointConfigResponse{
+		ID:               model.ID,
 		SystemID:         model.SystemID,
 		Name:             model.Name,
 		Description:      model.Description,
@@ -80,6 +82,7 @@ func ConvertHealthcheckConfigsToResponse(system models.System, configs []models.
 		switch config.ConfigType {
 		case models.SiteTitle:
 			siteTitleConfigs = append(siteTitleConfigs, schemas.HealthcheckSiteTitleConfigResponse{
+				ID:            config.ID,
 				SystemID:      config.SystemID,
 				Name:          config.Name,
 				Description:   config.Description,
@@ -91,6 +94,7 @@ func ConvertHealthcheckConfigsToResponse(system models.System, configs []models.
 			})
 		case models.Endpoint:
 			endpointConfigs = append(endpointConfigs, schemas.HealthcheckEndpointConfigResponse{
+				ID:               config.ID,
 				SystemID:         config.SystemID,
 				Name:             config.Name,
 				Description:      config.Description,
@@ -110,5 +114,39 @@ func ConvertHealthcheckConfigsToResponse(system models.System, configs []models.
 		SystemResponse:   *systemResponse,
 		SiteTitleConfigs: siteTitleConfigs,
 		EndpointConfigs:  endpointConfigs,
+	}
+}
+
+// models.HealthcheckConfigをschemas.HealthcheckConfigResponseに変換
+func ConvertHealthcheckConfigToResponse(model *models.HealthcheckConfig) *schemas.HealthcheckConfigResponse {
+	if model == nil {
+		return nil
+	}
+	return &schemas.HealthcheckConfigResponse{
+		ID:            model.ID,
+		SystemID:      model.SystemID,
+		Name:          model.Name,
+		Description:   model.Description,
+		ConfigType:    string(model.ConfigType),
+		ExpectedValue: model.ExpectedValue,
+		Url:           model.Url,
+		IsActive:      model.IsActive,
+		CreatedAt:     model.CreatedAt,
+		UpdatedAt:     model.UpdatedAt,
+	}
+}
+
+// models.HealthcheckLogをschemas.HealthcheckLogsResponseに変換
+func ConvertModelToHealthcheckLogsResponse(model *models.HealthcheckLog) *schemas.HealthcheckLogsResponse {
+	if model == nil {
+		return nil
+	}
+	return &schemas.HealthcheckLogsResponse{
+		ID:                  model.ID,
+		IsAlive:             model.IsAlive,
+		ResponseValue:       model.ResponseValue,
+		HealthcheckConfigId: model.HealthcheckConfigId,
+		CreatedAt:           model.CreatedAt,
+		UpdatedAt:           model.UpdatedAt,
 	}
 }

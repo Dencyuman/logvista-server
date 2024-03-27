@@ -5,6 +5,49 @@ definitions:
       message:
         type: string
     type: object
+  schemas.HealthcheckConfigResponse:
+    properties:
+      config_type:
+        description: 設定タイプ
+        example: SiteTitle
+        type: string
+      created_at:
+        description: 作成日時
+        example: "2023-01-01T00:00:00.000000+09:00"
+        type: string
+      description:
+        description: 設定の説明
+        example: sampleDescription
+        type: string
+      expected_value:
+        description: 想定値
+        example: sampleValue
+        type: string
+      id:
+        description: 設定ID
+        example: 00000000-0000-0000-0000-000000000000
+        type: string
+      is_active:
+        description: 有効かどうか
+        example: true
+        type: boolean
+      name:
+        description: 設定名
+        example: sampleName
+        type: string
+      system_id:
+        description: システムID
+        example: 00000000-0000-0000-0000-000000000000
+        type: string
+      updated_at:
+        description: 更新日時
+        example: "2023-01-01T00:00:00.000000+09:00"
+        type: string
+      url:
+        description: アクセス先url
+        example: http://localhost:8080/
+        type: string
+    type: object
   schemas.HealthcheckConfigsResponse:
     properties:
       category:
@@ -80,6 +123,10 @@ definitions:
         description: 想定レスポンス
         example: sampleSystem API Server is running!
         type: string
+      id:
+        description: ログID
+        example: 00000000-0000-0000-0000-000000000000
+        type: string
       is_active:
         description: 有効かどうか
         example: true
@@ -104,6 +151,45 @@ definitions:
     - created_at
     - system_id
     - updated_at
+    type: object
+  schemas.HealthcheckLogsListResponse:
+    properties:
+      config:
+        allOf:
+        - $ref: '#/definitions/schemas.HealthcheckConfigResponse'
+        description: ヘルスチェック設定
+      logs:
+        description: ログリスト
+        items:
+          $ref: '#/definitions/schemas.HealthcheckLogsResponse'
+        type: array
+    type: object
+  schemas.HealthcheckLogsResponse:
+    properties:
+      created_at:
+        description: 作成日時
+        example: "2023-01-01T00:00:00.000000+09:00"
+        type: string
+      healthcheck_config_id:
+        description: ヘルスチェック設定ID
+        example: 00000000-0000-0000-0000-000000000000
+        type: string
+      id:
+        description: ログID
+        example: 00000000-0000-0000-0000-000000000000
+        type: string
+      is_alive:
+        description: ヘルスチェック結果
+        example: true
+        type: boolean
+      response_value:
+        description: レスポンス値
+        example: sampleResponse
+        type: string
+      updated_at:
+        description: 更新日時
+        example: "2023-01-01T00:00:00.000000+09:00"
+        type: string
     type: object
   schemas.HealthcheckSiteTitleConfigBody:
     properties:
@@ -147,6 +233,10 @@ definitions:
       expected_title:
         description: 想定タイトル
         example: sampleTitle
+        type: string
+      id:
+        description: ログID
+        example: 00000000-0000-0000-0000-000000000000
         type: string
       is_active:
         description: 有効かどうか
@@ -600,29 +690,41 @@ paths:
       summary: ヘルスチェック設定取得用エンドポイント
       tags:
       - healthcheck
-  /healthcheck/configs/{systemId}:
+  /healthcheck/configs/{configId}/logs:
     get:
       consumes:
       - application/json
-      description: 200 systemIdで指定したシステムに紐づくヘルスチェック設定一覧の取得
+      description: 200 ヘルスチェックログ一覧の取得
       parameters:
-      - description: システムid
+      - description: 設定ID
         in: path
-        name: systemId
+        name: configId
         required: true
         type: string
+      - default: 10
+        description: 取得ログデータ件数
+        in: query
+        name: count
+        type: integer
+      - default: true
+        description: 降順フラグ
+        in: query
+        name: desc
+        type: boolean
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/schemas.HealthcheckConfigsResponse'
+            items:
+              $ref: '#/definitions/schemas.HealthcheckLogsListResponse'
+            type: array
         "500":
           description: Internal Server Error
           schema:
             $ref: '#/definitions/schemas.ErrorResponse'
-      summary: ヘルスチェック設定取得用エンドポイント(システム別)
+      summary: ヘルスチェックログ取得用エンドポイント
       tags:
       - healthcheck
   /healthcheck/configs/endpoint:
@@ -723,6 +825,31 @@ paths:
           schema:
             $ref: '#/definitions/schemas.ErrorResponse'
       summary: ヘルスチェック設定テスト用エンドポイント(SiteTitle)
+      tags:
+      - healthcheck
+  /healthcheck/configs/systems/{systemId}:
+    get:
+      consumes:
+      - application/json
+      description: 200 systemIdで指定したシステムに紐づくヘルスチェック設定一覧の取得
+      parameters:
+      - description: システムid
+        in: path
+        name: systemId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.HealthcheckConfigsResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+      summary: ヘルスチェック設定取得用エンドポイント(システム別)
       tags:
       - healthcheck
   /logs/:

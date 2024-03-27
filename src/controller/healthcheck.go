@@ -9,6 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
+	"strconv"
 )
 
 // @Summary ヘルスチェック設定取得用エンドポイント
@@ -48,7 +49,7 @@ func (ctrl *AppController) GetHealthcheckConfigs(c *gin.Context) {
 // @Produce json
 // @Success 200 {object} schemas.HealthcheckConfigsResponse
 // @Failure 500 {object} schemas.ErrorResponse
-// @Router /healthcheck/configs/{systemId} [get]
+// @Router /healthcheck/configs/systems/{systemId} [get]
 // @Param systemId path string true "システムid"
 func (ctrl *AppController) GetSystemHealthcheckConfigs(c *gin.Context) {
 	// パスパラメータからIDを取得する
@@ -211,4 +212,52 @@ func (ctrl *AppController) HealthcheckEndpointConfig(c *gin.Context) {
 	responseObject := converter.ConvertModelToHealthcheckEndpointConfigResponse(modelObject)
 
 	c.JSON(http.StatusOK, responseObject)
+}
+
+// @Summary ヘルスチェックログ取得用エンドポイント
+// @Tags healthcheck
+// @Description 200 ヘルスチェックログ一覧の取得
+// @Accept json
+// @Produce json
+// @Success 200 {object} []schemas.HealthcheckLogsListResponse
+// @Failure 500 {object} schemas.ErrorResponse
+// @Router /healthcheck/configs/{configId}/logs [get]
+// @Param configId path string true "設定ID"
+// @Param count query int false "取得ログデータ件数" default(10)
+// @Param desc query bool false "降順フラグ" default(true)
+func (ctrl *AppController) GetHealthcheckLogs(c *gin.Context) {
+	configID := c.Param("configId")
+	count, err := strconv.Atoi(c.Query("count"))
+	desc, err := strconv.ParseBool(c.Query("desc"))
+	if configID == "" {
+		c.JSON(http.StatusBadRequest, schemas.ErrorResponse{Message: "Config ID is required"})
+		return
+	}
+	config, err := crud.FindHealthcheckConfigByID(ctrl.DB, configID)
+	if err != nil {
+		c.JSON(http.StatusNotFound, schemas.ErrorResponse{Message: "Config Not Found"})
+		return
+	}
+	healthcheckLogs, err := crud.FindHealthcheckLogs(ctrl.DB, configID, count, desc)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, schemas.ErrorResponse{Message: err.Error()})
+		return
+	}
+
+	// 取得したConfigをレスポンスに変換
+	healthcheckConfig := converter.ConvertHealthcheckConfigToResponse(config)
+
+	// 取得したログをレスポンスに変換
+	var healthcheckLogsResponse []schemas.HealthcheckLogsResponse
+	for _, healthcheckLog := range healthcheckLogs {
+		healthcheckLogSchema := converter.ConvertModelToHealthcheckLogsResponse(&healthcheckLog)
+		healthcheckLogsResponse = append(healthcheckLogsResponse, *healthcheckLogSchema)
+	}
+
+	healthcheckLogsList := schemas.HealthcheckLogsListResponse{
+		Config: *healthcheckConfig,
+		Logs:   healthcheckLogsResponse,
+	}
+
+	c.JSON(http.StatusOK, healthcheckLogsList)
 }
