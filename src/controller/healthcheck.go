@@ -48,6 +48,8 @@ func (ctrl *AppController) GetHealthcheckConfigs(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Success 200 {object} schemas.HealthcheckConfigsResponse
+// @Failure 400 {object} schemas.ErrorResponse
+// @Failure 404 {object} schemas.ErrorResponse
 // @Failure 500 {object} schemas.ErrorResponse
 // @Router /healthcheck/configs/systems/{systemId} [get]
 // @Param systemId path string true "システムid"
@@ -85,12 +87,13 @@ func (ctrl *AppController) GetSystemHealthcheckConfigs(c *gin.Context) {
 // @Description 200 設定通りにSiteTitleヘルスチェックを１回実行した結果を取得できる
 // @Accept json
 // @Produce json
-// @Success 200 {object} schemas.TestHealthcheckSiteTitleConfigResponse
+// @Success 200 {object} schemas.TestHealthcheckConfigResponse
+// @Failure 400 {object} schemas.ErrorResponse
 // @Failure 500 {object} schemas.ErrorResponse
 // @Router /healthcheck/configs/site-title/test [post]
-// @Param config body schemas.TestHealthcheckSiteTitleConfigBody false "SiteTitle用設定値"
+// @Param config body schemas.TestHealthcheckConfigBody false "SiteTitle用設定値"
 func TestHealthcheckSiteTitleConfig(c *gin.Context) {
-	var config schemas.TestHealthcheckSiteTitleConfigBody
+	var config schemas.TestHealthcheckConfigBody
 	if err := c.ShouldBindJSON(&config); err != nil {
 		log.Printf("Error binding JSON: %v\n", err)
 		c.JSON(http.StatusBadRequest, schemas.ErrorResponse{Message: "Bad Request"})
@@ -104,9 +107,9 @@ func TestHealthcheckSiteTitleConfig(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"expected_title":     config.ExpectedTitle,
-		"fetched_title":      fetchedTitle,
-		"healthcheck_result": fetchedTitle == config.ExpectedTitle,
+		"expected_value":     config.ExpectedValue,
+		"fetched_value":      fetchedTitle,
+		"healthcheck_result": fetchedTitle == config.ExpectedValue,
 	})
 }
 
@@ -115,12 +118,13 @@ func TestHealthcheckSiteTitleConfig(c *gin.Context) {
 // @Description 200 設定通りにEndpointヘルスチェックを１回実行した結果を取得できる
 // @Accept json
 // @Produce json
-// @Success 200 {object} schemas.TestHealthcheckEndpointConfigResponse
+// @Success 200 {object} schemas.TestHealthcheckConfigResponse
+// @Failure 400 {object} schemas.ErrorResponse
 // @Failure 500 {object} schemas.ErrorResponse
 // @Router /healthcheck/configs/endpoint/test [post]
-// @Param config body schemas.TestHealthcheckEndpointConfigBody false "Endpoint用設定値"
+// @Param config body schemas.TestHealthcheckConfigBody false "Endpoint用設定値"
 func TestHealthcheckEndpointConfig(c *gin.Context) {
-	var config schemas.TestHealthcheckEndpointConfigBody
+	var config schemas.TestHealthcheckConfigBody
 	if err := c.ShouldBindJSON(&config); err != nil {
 		log.Printf("Error binding JSON: %v\n", err)
 		c.JSON(http.StatusBadRequest, schemas.ErrorResponse{Message: "Bad Request"})
@@ -134,9 +138,9 @@ func TestHealthcheckEndpointConfig(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"expected_title":     config.ExpectedStatus,
-		"fetched_title":      response,
-		"healthcheck_result": response == config.ExpectedStatus,
+		"expected_value":     config.ExpectedValue,
+		"fetched_value":      response,
+		"healthcheck_result": response == config.ExpectedValue,
 	})
 }
 
@@ -145,12 +149,14 @@ func TestHealthcheckEndpointConfig(c *gin.Context) {
 // @Description 200 SiteTitleヘルスチェックを設定する
 // @Accept json
 // @Produce json
-// @Success 200 {object} schemas.HealthcheckSiteTitleConfigResponse
+// @Success 200 {object} schemas.HealthcheckConfigResponse
+// @Failure 400 {object} schemas.ErrorResponse
+// @Failure 404 {object} schemas.ErrorResponse
 // @Failure 500 {object} schemas.ErrorResponse
 // @Router /healthcheck/configs/site-title [post]
-// @Param config body schemas.HealthcheckSiteTitleConfigBody false "SiteTitle用設定値"
+// @Param config body schemas.HealthcheckConfigBody false "SiteTitle用設定値"
 func (ctrl *AppController) HealthcheckSiteTitleConfig(c *gin.Context) {
-	var config schemas.HealthcheckSiteTitleConfigBody
+	var config schemas.HealthcheckConfigBody
 	if err := c.ShouldBindJSON(&config); err != nil {
 		log.Printf("Error binding JSON: %v\n", err)
 		c.JSON(http.StatusBadRequest, schemas.ErrorResponse{Message: "Bad Request"})
@@ -164,7 +170,7 @@ func (ctrl *AppController) HealthcheckSiteTitleConfig(c *gin.Context) {
 		return
 	}
 
-	modelObject := converter.ConvertHealthcheckSiteTitleConfigBodyToModel(&config)
+	modelObject := converter.ConvertHealthcheckConfigBodyToModel(&config)
 
 	if err := crud.InsertHealthcheck(ctrl.DB, modelObject); err != nil {
 		log.Printf("Error inserting log: %v\n", err)
@@ -172,7 +178,7 @@ func (ctrl *AppController) HealthcheckSiteTitleConfig(c *gin.Context) {
 		return
 	}
 
-	responseObject := converter.ConvertModelToHealthcheckSiteTitleConfigResponse(modelObject)
+	responseObject := converter.ConvertModelToHealthcheckConfigResponse(modelObject)
 
 	c.JSON(http.StatusOK, responseObject)
 }
@@ -182,12 +188,12 @@ func (ctrl *AppController) HealthcheckSiteTitleConfig(c *gin.Context) {
 // @Description 200 Endpointヘルスチェックを設定する
 // @Accept json
 // @Produce json
-// @Success 200 {object} schemas.HealthcheckEndpointConfigResponse
+// @Success 200 {object} schemas.HealthcheckConfigResponse
 // @Failure 500 {object} schemas.ErrorResponse
 // @Router /healthcheck/configs/endpoint [post]
-// @Param config body schemas.HealthcheckEndpointConfigBody false "Endpoint用設定値"
+// @Param config body schemas.HealthcheckConfigBody false "Endpoint用設定値"
 func (ctrl *AppController) HealthcheckEndpointConfig(c *gin.Context) {
-	var config schemas.HealthcheckEndpointConfigBody
+	var config schemas.HealthcheckConfigBody
 	if err := c.ShouldBindJSON(&config); err != nil {
 		log.Printf("Error binding JSON: %v\n", err)
 		c.JSON(http.StatusBadRequest, schemas.ErrorResponse{Message: "Bad Request"})
@@ -201,7 +207,7 @@ func (ctrl *AppController) HealthcheckEndpointConfig(c *gin.Context) {
 		return
 	}
 
-	modelObject := converter.ConvertHealthcheckEndpointConfigBodyToModel(&config)
+	modelObject := converter.ConvertHealthcheckConfigBodyToModel(&config)
 
 	if err := crud.InsertHealthcheck(ctrl.DB, modelObject); err != nil {
 		log.Printf("Error inserting log: %v\n", err)
@@ -209,7 +215,7 @@ func (ctrl *AppController) HealthcheckEndpointConfig(c *gin.Context) {
 		return
 	}
 
-	responseObject := converter.ConvertModelToHealthcheckEndpointConfigResponse(modelObject)
+	responseObject := converter.ConvertModelToHealthcheckConfigResponse(modelObject)
 
 	c.JSON(http.StatusOK, responseObject)
 }
@@ -220,6 +226,8 @@ func (ctrl *AppController) HealthcheckEndpointConfig(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Success 200 {object} []schemas.HealthcheckLogsListResponse
+// @Failure 400 {object} schemas.ErrorResponse
+// @Failure 404 {object} schemas.ErrorResponse
 // @Failure 500 {object} schemas.ErrorResponse
 // @Router /healthcheck/configs/{configId}/logs [get]
 // @Param configId path string true "設定ID"
@@ -260,4 +268,35 @@ func (ctrl *AppController) GetHealthcheckLogs(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, healthcheckLogsList)
+}
+
+// @Summary ヘルスチェックConfig削除用エンドポイント
+// @Description ヘルスチェックの設定を削除する
+// @Tags healthcheck
+// @Accept json
+// @Produce json
+// @Router /healthcheck/configs/{configId} [delete]
+// @Param configId path string true "Configのid"
+// @Success 200 {string} string "Delete Success"
+// @Failure 400 {object} schemas.ErrorResponse
+// @Failure 404 {object} schemas.ErrorResponse
+// @Failure 500 {object} schemas.ErrorResponse
+func (ctrl *AppController) DeleteHealthcheckConfig(c *gin.Context) {
+	configID := c.Param("configId")
+	if configID == "" {
+		c.JSON(http.StatusBadRequest, schemas.ErrorResponse{Message: "Config ID is required"})
+		return
+	}
+
+	if _, err := crud.FindHealthcheckConfigByID(ctrl.DB, configID); err != nil {
+		c.JSON(http.StatusNotFound, schemas.ErrorResponse{Message: "Config Not Found"})
+		return
+	}
+
+	if err := crud.DeleteHealthcheckConfig(ctrl.DB, configID); err != nil {
+		c.JSON(http.StatusInternalServerError, schemas.ErrorResponse{Message: err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, "Delete Success")
 }

@@ -89,7 +89,7 @@ const docTemplate = `{
                         "name": "config",
                         "in": "body",
                         "schema": {
-                            "$ref": "#/definitions/schemas.HealthcheckEndpointConfigBody"
+                            "$ref": "#/definitions/schemas.HealthcheckConfigBody"
                         }
                     }
                 ],
@@ -97,7 +97,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/schemas.HealthcheckEndpointConfigResponse"
+                            "$ref": "#/definitions/schemas.HealthcheckConfigResponse"
                         }
                     },
                     "500": {
@@ -128,7 +128,7 @@ const docTemplate = `{
                         "name": "config",
                         "in": "body",
                         "schema": {
-                            "$ref": "#/definitions/schemas.TestHealthcheckEndpointConfigBody"
+                            "$ref": "#/definitions/schemas.TestHealthcheckConfigBody"
                         }
                     }
                 ],
@@ -136,7 +136,13 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/schemas.TestHealthcheckEndpointConfigResponse"
+                            "$ref": "#/definitions/schemas.TestHealthcheckConfigResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     },
                     "500": {
@@ -167,7 +173,7 @@ const docTemplate = `{
                         "name": "config",
                         "in": "body",
                         "schema": {
-                            "$ref": "#/definitions/schemas.HealthcheckSiteTitleConfigBody"
+                            "$ref": "#/definitions/schemas.HealthcheckConfigBody"
                         }
                     }
                 ],
@@ -175,7 +181,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/schemas.HealthcheckSiteTitleConfigResponse"
+                            "$ref": "#/definitions/schemas.HealthcheckConfigResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     },
                     "500": {
@@ -206,7 +224,7 @@ const docTemplate = `{
                         "name": "config",
                         "in": "body",
                         "schema": {
-                            "$ref": "#/definitions/schemas.TestHealthcheckSiteTitleConfigBody"
+                            "$ref": "#/definitions/schemas.TestHealthcheckConfigBody"
                         }
                     }
                 ],
@@ -214,7 +232,13 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/schemas.TestHealthcheckSiteTitleConfigResponse"
+                            "$ref": "#/definitions/schemas.TestHealthcheckConfigResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     },
                     "500": {
@@ -253,6 +277,68 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/schemas.HealthcheckConfigsResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/healthcheck/configs/{configId}": {
+            "delete": {
+                "description": "ヘルスチェックの設定を削除する",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "healthcheck"
+                ],
+                "summary": "ヘルスチェックConfig削除用エンドポイント",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Configのid",
+                        "name": "configId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Delete Success",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     },
                     "500": {
@@ -308,6 +394,18 @@ const docTemplate = `{
                             "items": {
                                 "$ref": "#/definitions/schemas.HealthcheckLogsListResponse"
                             }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ErrorResponse"
                         }
                     },
                     "500": {
@@ -764,6 +862,17 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "models.HealthcheckConfigType": {
+            "type": "string",
+            "enum": [
+                "SiteTitle",
+                "Endpoint"
+            ],
+            "x-enum-varnames": [
+                "SiteTitle",
+                "Endpoint"
+            ]
+        },
         "schemas.ErrorResponse": {
             "type": "object",
             "properties": {
@@ -772,12 +881,67 @@ const docTemplate = `{
                 }
             }
         },
-        "schemas.HealthcheckConfigResponse": {
+        "schemas.HealthcheckConfigBody": {
             "type": "object",
+            "required": [
+                "config_type",
+                "system_id"
+            ],
             "properties": {
                 "config_type": {
                     "description": "設定タイプ",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.HealthcheckConfigType"
+                        }
+                    ],
+                    "example": "SiteTitle"
+                },
+                "description": {
+                    "description": "設定の説明",
                     "type": "string",
+                    "example": "sampleDescription"
+                },
+                "expected_value": {
+                    "description": "想定値",
+                    "type": "string",
+                    "example": "sampleValue"
+                },
+                "is_active": {
+                    "description": "有効かどうか",
+                    "type": "boolean",
+                    "example": true
+                },
+                "name": {
+                    "description": "設定名",
+                    "type": "string",
+                    "example": "sampleName"
+                },
+                "system_id": {
+                    "description": "システムid",
+                    "type": "string",
+                    "example": "00000000-0000-0000-0000-000000000000"
+                },
+                "url": {
+                    "description": "アクセス先url",
+                    "type": "string",
+                    "example": "http://localhost:8080/"
+                }
+            }
+        },
+        "schemas.HealthcheckConfigResponse": {
+            "type": "object",
+            "required": [
+                "config_type"
+            ],
+            "properties": {
+                "config_type": {
+                    "description": "設定タイプ",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.HealthcheckConfigType"
+                        }
+                    ],
                     "example": "SiteTitle"
                 },
                 "created_at": {
@@ -843,13 +1007,6 @@ const docTemplate = `{
                     "type": "string",
                     "example": "2023-01-01T00:00:00.000000+09:00"
                 },
-                "endpoint_configs": {
-                    "description": "エンドポイントヘルスチェックの設定",
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/schemas.HealthcheckEndpointConfigResponse"
-                    }
-                },
                 "id": {
                     "type": "string",
                     "example": "00000000-0000-0000-0000-000000000000"
@@ -859,108 +1016,15 @@ const docTemplate = `{
                     "example": "sample_system"
                 },
                 "site_title_configs": {
-                    "description": "サイトタイトルヘルスチェックの設定",
+                    "description": "Config",
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/schemas.HealthcheckSiteTitleConfigResponse"
+                        "$ref": "#/definitions/schemas.HealthcheckConfigResponse"
                     }
                 },
                 "updated_at": {
                     "type": "string",
                     "example": "2023-01-01T00:00:00.000000+09:00"
-                }
-            }
-        },
-        "schemas.HealthcheckEndpointConfigBody": {
-            "type": "object",
-            "required": [
-                "system_id"
-            ],
-            "properties": {
-                "description": {
-                    "description": "設定の説明",
-                    "type": "string",
-                    "example": "sampleDescription"
-                },
-                "expected_response": {
-                    "description": "想定レスポンス",
-                    "type": "string",
-                    "example": "sampleSystem API Server is running!"
-                },
-                "is_active": {
-                    "description": "有効かどうか",
-                    "type": "boolean",
-                    "example": true
-                },
-                "name": {
-                    "description": "設定名",
-                    "type": "string",
-                    "example": "sampleName"
-                },
-                "system_id": {
-                    "description": "システムid",
-                    "type": "string",
-                    "example": "00000000-0000-0000-0000-000000000000"
-                },
-                "url": {
-                    "description": "アクセス先url",
-                    "type": "string",
-                    "example": "http://localhost:8080/"
-                }
-            }
-        },
-        "schemas.HealthcheckEndpointConfigResponse": {
-            "type": "object",
-            "required": [
-                "created_at",
-                "system_id",
-                "updated_at"
-            ],
-            "properties": {
-                "created_at": {
-                    "description": "作成日時",
-                    "type": "string",
-                    "example": "2023-01-01T00:00:00.000000+09:00"
-                },
-                "description": {
-                    "description": "設定の説明",
-                    "type": "string",
-                    "example": "sampleDescription"
-                },
-                "expected_response": {
-                    "description": "想定レスポンス",
-                    "type": "string",
-                    "example": "sampleSystem API Server is running!"
-                },
-                "id": {
-                    "description": "ログID",
-                    "type": "string",
-                    "example": "00000000-0000-0000-0000-000000000000"
-                },
-                "is_active": {
-                    "description": "有効かどうか",
-                    "type": "boolean",
-                    "example": true
-                },
-                "name": {
-                    "description": "設定名",
-                    "type": "string",
-                    "example": "sampleName"
-                },
-                "system_id": {
-                    "description": "システムid",
-                    "type": "string",
-                    "example": "00000000-0000-0000-0000-000000000000"
-                },
-                "updated_at": {
-                    "description": "更新日時",
-                    "type": "string",
-                    "example": "2023-01-01T00:00:00.000000+09:00"
-                },
-                "url": {
-                    "description": "アクセス先url",
-                    "type": "string",
-                    "example": "http://localhost:8080/"
                 }
             }
         },
@@ -1016,99 +1080,6 @@ const docTemplate = `{
                     "description": "更新日時",
                     "type": "string",
                     "example": "2023-01-01T00:00:00.000000+09:00"
-                }
-            }
-        },
-        "schemas.HealthcheckSiteTitleConfigBody": {
-            "type": "object",
-            "required": [
-                "system_id"
-            ],
-            "properties": {
-                "description": {
-                    "description": "設定の説明",
-                    "type": "string",
-                    "example": "sampleDescription"
-                },
-                "expected_title": {
-                    "description": "想定タイトル",
-                    "type": "string",
-                    "example": "sampleTitle"
-                },
-                "is_active": {
-                    "description": "有効かどうか",
-                    "type": "boolean",
-                    "example": true
-                },
-                "name": {
-                    "description": "設定名",
-                    "type": "string",
-                    "example": "sampleName"
-                },
-                "system_id": {
-                    "description": "システムid",
-                    "type": "string",
-                    "example": "00000000-0000-0000-0000-000000000000"
-                },
-                "url": {
-                    "description": "アクセス先url",
-                    "type": "string",
-                    "example": "http://localhost:8080/"
-                }
-            }
-        },
-        "schemas.HealthcheckSiteTitleConfigResponse": {
-            "type": "object",
-            "required": [
-                "created_at",
-                "system_id",
-                "updated_at"
-            ],
-            "properties": {
-                "created_at": {
-                    "description": "作成日時",
-                    "type": "string",
-                    "example": "2023-01-01T00:00:00.000000+09:00"
-                },
-                "description": {
-                    "description": "設定の説明",
-                    "type": "string",
-                    "example": "sampleDescription"
-                },
-                "expected_title": {
-                    "description": "想定タイトル",
-                    "type": "string",
-                    "example": "sampleTitle"
-                },
-                "id": {
-                    "description": "ログID",
-                    "type": "string",
-                    "example": "00000000-0000-0000-0000-000000000000"
-                },
-                "is_active": {
-                    "description": "有効かどうか",
-                    "type": "boolean",
-                    "example": true
-                },
-                "name": {
-                    "description": "設定名",
-                    "type": "string",
-                    "example": "sampleName"
-                },
-                "system_id": {
-                    "description": "システムid",
-                    "type": "string",
-                    "example": "00000000-0000-0000-0000-000000000000"
-                },
-                "updated_at": {
-                    "description": "更新日時",
-                    "type": "string",
-                    "example": "2023-01-01T00:00:00.000000+09:00"
-                },
-                "url": {
-                    "description": "アクセス先url",
-                    "type": "string",
-                    "example": "http://localhost:8080/"
                 }
             }
         },
@@ -1521,13 +1492,13 @@ const docTemplate = `{
                 }
             }
         },
-        "schemas.TestHealthcheckEndpointConfigBody": {
+        "schemas.TestHealthcheckConfigBody": {
             "type": "object",
             "properties": {
-                "expected_status": {
-                    "description": "想定レスポンス",
+                "expected_value": {
+                    "description": "想定値",
                     "type": "string",
-                    "example": "sampleSystem API Server is running!"
+                    "example": "sampleValue"
                 },
                 "url": {
                     "description": "アクセス先url",
@@ -1536,53 +1507,18 @@ const docTemplate = `{
                 }
             }
         },
-        "schemas.TestHealthcheckEndpointConfigResponse": {
+        "schemas.TestHealthcheckConfigResponse": {
             "type": "object",
             "properties": {
-                "expected_status": {
-                    "description": "想定レスポンス",
+                "expected_value": {
+                    "description": "想定値",
                     "type": "string",
-                    "example": "sampleSystem API Server is running!"
+                    "example": "sampleValue"
                 },
-                "fetched-status": {
-                    "description": "取得されたタイトル",
+                "fetched-value": {
+                    "description": "取得された値",
                     "type": "string",
-                    "example": "sampleStatus"
-                },
-                "healthcheck_result": {
-                    "description": "ヘルスチェック結果",
-                    "type": "boolean",
-                    "example": true
-                }
-            }
-        },
-        "schemas.TestHealthcheckSiteTitleConfigBody": {
-            "type": "object",
-            "properties": {
-                "expected_title": {
-                    "description": "想定タイトル",
-                    "type": "string",
-                    "example": "sampleTitle"
-                },
-                "url": {
-                    "description": "アクセス先url",
-                    "type": "string",
-                    "example": "http://localhost:8080/"
-                }
-            }
-        },
-        "schemas.TestHealthcheckSiteTitleConfigResponse": {
-            "type": "object",
-            "properties": {
-                "expected_title": {
-                    "description": "想定タイトル",
-                    "type": "string",
-                    "example": "sampleTitle"
-                },
-                "fetched-title": {
-                    "description": "取得されたタイトル",
-                    "type": "string",
-                    "example": "sampleTitle"
+                    "example": "sampleValue"
                 },
                 "healthcheck_result": {
                     "description": "ヘルスチェック結果",

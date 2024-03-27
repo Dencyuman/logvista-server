@@ -56,6 +56,7 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 				ConfigGroup.POST("/site-title", appController.HealthcheckSiteTitleConfig)
 				ConfigGroup.POST("/endpoint/test", controller.TestHealthcheckEndpointConfig)
 				ConfigGroup.POST("/endpoint", appController.HealthcheckEndpointConfig)
+				ConfigGroup.DELETE("/:configId", appController.DeleteHealthcheckConfig)
 			}
 		}
 	}

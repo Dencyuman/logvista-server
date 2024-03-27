@@ -100,3 +100,28 @@ func FindHealthcheckConfigByID(db *gorm.DB, id string) (*models.HealthcheckConfi
 	}
 	return &healthcheckConfig, nil
 }
+
+// UpdateHealthcheckConfig は指定されたHealthcheckConfigエントリをデータベースで更新します。
+func UpdateHealthcheckConfig(db *gorm.DB, healthcheckConfig *models.HealthcheckConfig) error {
+	if healthcheckConfig == nil {
+		return errors.New("received nil healthcheck config data")
+	}
+
+	if err := db.Save(healthcheckConfig).Error; err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// DeleteHealthcheckConfig は指定されたIDに一致するHealthcheckConfigエントリをデータベースから削除します。
+func DeleteHealthcheckConfig(db *gorm.DB, id string) error {
+	if err := db.Where("healthcheck_config_id = ?", id).Delete(&models.HealthcheckLog{}).Error; err != nil {
+		return err
+	}
+
+	if err := db.Where("id = ?", id).Delete(&models.HealthcheckConfig{}).Error; err != nil {
+		return err
+	}
+	return nil
+}
