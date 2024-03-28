@@ -2,6 +2,7 @@ package background
 
 import (
 	"fmt"
+	"github.com/Dencyuman/logvista-server/config"
 	"github.com/Dencyuman/logvista-server/src/crud"
 	"github.com/Dencyuman/logvista-server/src/models"
 	"gorm.io/gorm"
@@ -72,7 +73,7 @@ func FetchHealthcheckAPIResponseAsString(url string) (string, error) {
 
 // 60秒ごとにサーバーのヘルスチェックを行う関数
 func (ctrl *BackgroundApp) checkServer() {
-	interval := 60 * time.Second // インターバルを60秒に設定
+	interval := time.Duration(config.AppConfig.HealthcheckTimespan) * time.Second
 	ticker := time.NewTicker(interval)
 	defer ticker.Stop()
 
