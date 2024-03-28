@@ -26,12 +26,15 @@ func (ctrl *AppController) GetHealthcheckConfigs(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, schemas.ErrorResponse{Message: err.Error()})
 		return
 	}
-	var healthcheckConfigsResponse []schemas.HealthcheckConfigsResponse
+	var healthcheckConfigsResponse = make([]schemas.HealthcheckConfigsResponse, 0)
 	for _, system := range systems {
 		healthcheckConfigs, err := crud.FindHealthcheckConfigs(ctrl.DB, system.ID)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, schemas.ErrorResponse{Message: err.Error()})
 			return
+		}
+		if len(healthcheckConfigs) == 0 {
+			continue
 		}
 		healthcheckConfig := converter.ConvertHealthcheckConfigsToResponse(system, healthcheckConfigs)
 
