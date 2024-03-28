@@ -2,13 +2,14 @@ package controller
 
 import (
 	"fmt"
+	"github.com/Dencyuman/logvista-server/src/background"
 	"github.com/Dencyuman/logvista-server/src/converter"
 	"github.com/Dencyuman/logvista-server/src/crud"
 	"github.com/Dencyuman/logvista-server/src/schemas"
-	"github.com/Dencyuman/logvista-server/src/utils"
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
+	"strconv"
 )
 
 // @Summary ヘルスチェック設定取得用エンドポイント
@@ -25,12 +26,15 @@ func (ctrl *AppController) GetHealthcheckConfigs(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, schemas.ErrorResponse{Message: err.Error()})
 		return
 	}
-	var healthcheckConfigsResponse []schemas.HealthcheckConfigsResponse
+	var healthcheckConfigsResponse = make([]schemas.HealthcheckConfigsResponse, 0)
 	for _, system := range systems {
 		healthcheckConfigs, err := crud.FindHealthcheckConfigs(ctrl.DB, system.ID)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, schemas.ErrorResponse{Message: err.Error()})
 			return
+		}
+		if len(healthcheckConfigs) == 0 {
+			continue
 		}
 		healthcheckConfig := converter.ConvertHealthcheckConfigsToResponse(system, healthcheckConfigs)
 
@@ -47,8 +51,10 @@ func (ctrl *AppController) GetHealthcheckConfigs(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Success 200 {object} schemas.HealthcheckConfigsResponse
+// @Failure 400 {object} schemas.ErrorResponse
+// @Failure 404 {object} schemas.ErrorResponse
 // @Failure 500 {object} schemas.ErrorResponse
-// @Router /healthcheck/configs/{systemId} [get]
+// @Router /healthcheck/configs/systems/{systemId} [get]
 // @Param systemId path string true "システムid"
 func (ctrl *AppController) GetSystemHealthcheckConfigs(c *gin.Context) {
 	// パスパラメータからIDを取得する
@@ -79,80 +85,72 @@ func (ctrl *AppController) GetSystemHealthcheckConfigs(c *gin.Context) {
 	c.JSON(http.StatusOK, healthcheckConfigsResponse)
 }
 
-// @Summary ヘルスチェック設定テスト用エンドポイント(SiteTitle)
+// @Summary ヘルスチェック設定テスト用エンドポイント
 // @Tags healthcheck
-// @Description 200 設定通りにSiteTitleヘルスチェックを１回実行した結果を取得できる
+// @Description 200 設定通りにヘルスチェックを１回実行した結果を取得できる
 // @Accept json
 // @Produce json
-// @Success 200 {object} schemas.TestHealthcheckSiteTitleConfigResponse
+// @Success 200 {object} schemas.TestHealthcheckConfigResponse
+// @Failure 400 {object} schemas.ErrorResponse
 // @Failure 500 {object} schemas.ErrorResponse
-// @Router /healthcheck/configs/site-title/test [post]
-// @Param config body schemas.TestHealthcheckSiteTitleConfigBody false "SiteTitle用設定値"
-func TestHealthcheckSiteTitleConfig(c *gin.Context) {
-	var config schemas.TestHealthcheckSiteTitleConfigBody
+// @Router /healthcheck/configs/test [post]
+// @Param config body schemas.TestHealthcheckConfigBody false "ヘルスチェック用設定値"
+func TestHealthcheckConfig(c *gin.Context) {
+	var config schemas.TestHealthcheckConfigBody
 	if err := c.ShouldBindJSON(&config); err != nil {
 		log.Printf("Error binding JSON: %v\n", err)
 		c.JSON(http.StatusBadRequest, schemas.ErrorResponse{Message: "Bad Request"})
 		return
 	}
 
-	fetchedTitle, err := utils.FetchPageTitle(config.Url)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, schemas.ErrorResponse{Message: err.Error()})
+	var fetchedValue string
+	var fetchError error
+	if config.ConfigType == "SiteTitle" {
+		fetchedValue, fetchError = background.FetchPageTitle(config.Url)
+		if fetchError != nil {
+			c.JSON(http.StatusInternalServerError, schemas.ErrorResponse{Message: fetchError.Error()})
+			return
+		}
+	} else if config.ConfigType == "Endpoint" {
+		fetchedValue, fetchError = background.FetchHealthcheckAPIResponseAsString(config.Url)
+		if fetchError != nil {
+			c.JSON(http.StatusInternalServerError, schemas.ErrorResponse{Message: fetchError.Error()})
+			return
+		}
+	} else {
+		c.JSON(http.StatusBadRequest, schemas.ErrorResponse{Message: "ConfigType must be SiteTitle or Endpoint"})
 		return
+
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"expected_title":     config.ExpectedTitle,
-		"fetched_title":      fetchedTitle,
-		"healthcheck_result": fetchedTitle == config.ExpectedTitle,
+		"config_type":        config.ConfigType,
+		"expected_value":     config.ExpectedValue,
+		"fetched_value":      fetchedValue,
+		"healthcheck_result": fetchedValue == config.ExpectedValue,
 	})
 }
 
-// @Summary ヘルスチェック設定テスト用エンドポイント(Endpoint)
+// @Summary ヘルスチェック設定用エンドポイント
 // @Tags healthcheck
-// @Description 200 設定通りにEndpointヘルスチェックを１回実行した結果を取得できる
+// @Description 200 ヘルスチェックを設定する
 // @Accept json
 // @Produce json
-// @Success 200 {object} schemas.TestHealthcheckEndpointConfigResponse
+// @Success 200 {object} schemas.HealthcheckConfigResponse
+// @Failure 400 {object} schemas.ErrorResponse
+// @Failure 404 {object} schemas.ErrorResponse
 // @Failure 500 {object} schemas.ErrorResponse
-// @Router /healthcheck/configs/endpoint/test [post]
-// @Param config body schemas.TestHealthcheckEndpointConfigBody false "Endpoint用設定値"
-func TestHealthcheckEndpointConfig(c *gin.Context) {
-	var config schemas.TestHealthcheckEndpointConfigBody
+// @Router /healthcheck/configs [post]
+// @Param config body schemas.HealthcheckConfigBody false "ヘルスチェック用設定値"
+func (ctrl *AppController) HealthcheckConfig(c *gin.Context) {
+	var config schemas.HealthcheckConfigBody
 	if err := c.ShouldBindJSON(&config); err != nil {
 		log.Printf("Error binding JSON: %v\n", err)
 		c.JSON(http.StatusBadRequest, schemas.ErrorResponse{Message: "Bad Request"})
 		return
 	}
-
-	fetchedStatus, err := utils.FetchStatusCode(config.Url)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, schemas.ErrorResponse{Message: err.Error()})
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{
-		"expected_title":     config.ExpectedStatus,
-		"fetched_title":      fetchedStatus,
-		"healthcheck_result": fetchedStatus == config.ExpectedStatus,
-	})
-}
-
-// @Summary ヘルスチェック設定用エンドポイント(SiteTitle)
-// @Tags healthcheck
-// @Description 200 SiteTitleヘルスチェックを設定する
-// @Accept json
-// @Produce json
-// @Success 200 {object} schemas.HealthcheckSiteTitleConfigResponse
-// @Failure 500 {object} schemas.ErrorResponse
-// @Router /healthcheck/configs/site-title [post]
-// @Param config body schemas.HealthcheckSiteTitleConfigBody false "SiteTitle用設定値"
-func (ctrl *AppController) HealthcheckSiteTitleConfig(c *gin.Context) {
-	var config schemas.HealthcheckSiteTitleConfigBody
-	if err := c.ShouldBindJSON(&config); err != nil {
-		log.Printf("Error binding JSON: %v\n", err)
-		c.JSON(http.StatusBadRequest, schemas.ErrorResponse{Message: "Bad Request"})
+	if config.ConfigType != "SiteTitle" && config.ConfigType != "Endpoint" {
+		c.JSON(http.StatusBadRequest, schemas.ErrorResponse{Message: "ConfigType must be SiteTitle or Endpoint"})
 		return
 	}
 
@@ -163,7 +161,7 @@ func (ctrl *AppController) HealthcheckSiteTitleConfig(c *gin.Context) {
 		return
 	}
 
-	modelObject := converter.ConvertHealthcheckSiteTitleConfigBodyToModel(&config)
+	modelObject := converter.ConvertHealthcheckConfigBodyToModel(&config)
 
 	if err := crud.InsertHealthcheck(ctrl.DB, modelObject); err != nil {
 		log.Printf("Error inserting log: %v\n", err)
@@ -171,44 +169,140 @@ func (ctrl *AppController) HealthcheckSiteTitleConfig(c *gin.Context) {
 		return
 	}
 
-	responseObject := converter.ConvertModelToHealthcheckSiteTitleConfigResponse(modelObject)
+	responseObject := converter.ConvertModelToHealthcheckConfigResponse(modelObject)
 
 	c.JSON(http.StatusOK, responseObject)
 }
 
-// @Summary ヘルスチェック設定用エンドポイント(Endpoint)
+// @Summary ヘルスチェックログ取得用エンドポイント
 // @Tags healthcheck
-// @Description 200 Endpointヘルスチェックを設定する
+// @Description 200 ヘルスチェックログ一覧の取得
 // @Accept json
 // @Produce json
-// @Success 200 {object} schemas.HealthcheckEndpointConfigResponse
+// @Success 200 {object} []schemas.HealthcheckLogsListResponse
+// @Failure 400 {object} schemas.ErrorResponse
+// @Failure 404 {object} schemas.ErrorResponse
 // @Failure 500 {object} schemas.ErrorResponse
-// @Router /healthcheck/configs/endpoint [post]
-// @Param config body schemas.HealthcheckEndpointConfigBody false "Endpoint用設定値"
-func (ctrl *AppController) HealthcheckEndpointConfig(c *gin.Context) {
-	var config schemas.HealthcheckEndpointConfigBody
-	if err := c.ShouldBindJSON(&config); err != nil {
+// @Router /healthcheck/configs/{configId}/logs [get]
+// @Param configId path string true "設定ID"
+// @Param count query int false "取得ログデータ件数" default(10)
+// @Param desc query bool false "降順フラグ" default(true)
+func (ctrl *AppController) GetHealthcheckLogs(c *gin.Context) {
+	configID := c.Param("configId")
+	count, err := strconv.Atoi(c.Query("count"))
+	desc, err := strconv.ParseBool(c.Query("desc"))
+	if configID == "" {
+		c.JSON(http.StatusBadRequest, schemas.ErrorResponse{Message: "Config ID is required"})
+		return
+	}
+	config, err := crud.FindHealthcheckConfigByID(ctrl.DB, configID)
+	if err != nil {
+		c.JSON(http.StatusNotFound, schemas.ErrorResponse{Message: "Config Not Found"})
+		return
+	}
+	healthcheckLogs, err := crud.FindHealthcheckLogs(ctrl.DB, configID, count, desc)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, schemas.ErrorResponse{Message: err.Error()})
+		return
+	}
+
+	// 取得したConfigをレスポンスに変換
+	healthcheckConfig := converter.ConvertHealthcheckConfigToResponse(config)
+
+	// 取得したログをレスポンスに変換
+	var healthcheckLogsResponse []schemas.HealthcheckLogsResponse
+	for _, healthcheckLog := range healthcheckLogs {
+		healthcheckLogSchema := converter.ConvertModelToHealthcheckLogsResponse(&healthcheckLog)
+		healthcheckLogsResponse = append(healthcheckLogsResponse, *healthcheckLogSchema)
+	}
+
+	healthcheckLogsList := schemas.HealthcheckLogsListResponse{
+		Config: *healthcheckConfig,
+		Logs:   healthcheckLogsResponse,
+	}
+
+	c.JSON(http.StatusOK, healthcheckLogsList)
+}
+
+// @Summary ヘルスチェックConfig更新用エンドポイント
+// @Description ヘルスチェックの設定を更新する
+// @Tags healthcheck
+// @Accept json
+// @Produce json
+// @Router /healthcheck/configs/{configId} [put]
+// @Param configId path string true "Configのid"
+// @Param config body schemas.HealthcheckConfigBody true "ヘルスチェック設定"
+// @Success 200 {object} schemas.ResponseMessage
+// @Failure 400 {object} schemas.ErrorResponse
+// @Failure 404 {object} schemas.ErrorResponse
+// @Failure 500 {object} schemas.ErrorResponse
+func (ctrl *AppController) UpdateHealthcheckConfig(c *gin.Context) {
+	configID := c.Param("configId")
+	if configID == "" {
+		c.JSON(http.StatusBadRequest, schemas.ErrorResponse{Message: "Config ID is required"})
+		return
+	}
+
+	config, err := crud.FindHealthcheckConfigByID(ctrl.DB, configID)
+	if err != nil {
+		c.JSON(http.StatusNotFound, schemas.ErrorResponse{Message: "Config Not Found"})
+		return
+	}
+
+	var configBody schemas.HealthcheckConfigBody
+	if err := c.ShouldBindJSON(&configBody); err != nil {
 		log.Printf("Error binding JSON: %v\n", err)
 		c.JSON(http.StatusBadRequest, schemas.ErrorResponse{Message: "Bad Request"})
 		return
 	}
 
-	_, err := crud.FindSystemByID(ctrl.DB, config.SystemID)
-	if err != nil {
-		log.Printf("Error inserting log: %v\n", err)
-		c.JSON(http.StatusNotFound, schemas.ErrorResponse{Message: "System Not Found"})
+	config.SystemID = configBody.SystemID
+	config.Name = configBody.Name
+	config.Description = configBody.Description
+	config.ConfigType = configBody.ConfigType
+	config.ExpectedValue = configBody.ExpectedValue
+	config.Url = configBody.Url
+	config.IsActive = configBody.IsActive
+
+	if err := crud.UpdateHealthcheckConfig(ctrl.DB, config); err != nil {
+		c.JSON(http.StatusInternalServerError, schemas.ErrorResponse{Message: err.Error()})
 		return
 	}
 
-	modelObject := converter.ConvertHealthcheckEndpointConfigBodyToModel(&config)
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Update Success",
+	})
+}
 
-	if err := crud.InsertHealthcheck(ctrl.DB, modelObject); err != nil {
-		log.Printf("Error inserting log: %v\n", err)
-		c.JSON(http.StatusInternalServerError, schemas.ErrorResponse{Message: "Internal Server Error"})
+// @Summary ヘルスチェックConfig削除用エンドポイント
+// @Description ヘルスチェックの設定を削除する
+// @Tags healthcheck
+// @Accept json
+// @Produce json
+// @Router /healthcheck/configs/{configId} [delete]
+// @Param configId path string true "Configのid"
+// @Success 200 {object} schemas.ResponseMessage
+// @Failure 400 {object} schemas.ErrorResponse
+// @Failure 404 {object} schemas.ErrorResponse
+// @Failure 500 {object} schemas.ErrorResponse
+func (ctrl *AppController) DeleteHealthcheckConfig(c *gin.Context) {
+	configID := c.Param("configId")
+	if configID == "" {
+		c.JSON(http.StatusBadRequest, schemas.ErrorResponse{Message: "Config ID is required"})
 		return
 	}
 
-	responseObject := converter.ConvertModelToHealthcheckEndpointConfigResponse(modelObject)
+	if _, err := crud.FindHealthcheckConfigByID(ctrl.DB, configID); err != nil {
+		c.JSON(http.StatusNotFound, schemas.ErrorResponse{Message: "Config Not Found"})
+		return
+	}
 
-	c.JSON(http.StatusOK, responseObject)
+	if err := crud.DeleteHealthcheckConfig(ctrl.DB, configID); err != nil {
+		c.JSON(http.StatusInternalServerError, schemas.ErrorResponse{Message: err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Delete Success",
+	})
 }

@@ -27,7 +27,13 @@ func Connect() (*gorm.DB, error) {
 }
 
 func Migrate(db *gorm.DB) error {
-	err := db.AutoMigrate(&models.Log{}, &models.Traceback{}, &models.System{}, &models.HealthcheckConfig{})
+	err := db.AutoMigrate(
+		&models.Log{},
+		&models.Traceback{},
+		&models.System{},
+		&models.HealthcheckConfig{},
+		&models.HealthcheckLog{},
+	)
 	if err != nil {
 		log.Println("Migration failed:", err)
 		return err
@@ -36,7 +42,13 @@ func Migrate(db *gorm.DB) error {
 }
 
 func ResetTables(db *gorm.DB) error {
-	err := db.Migrator().DropTable(&models.Log{}, &models.Traceback{}, &models.System{}, &models.HealthcheckConfig{})
+	err := db.Migrator().DropTable(
+		&models.Log{},
+		&models.Traceback{},
+		&models.System{},
+		&models.HealthcheckConfig{},
+		&models.HealthcheckLog{},
+	)
 	if err != nil {
 		log.Println("Failed to reset tables:", err)
 		return err

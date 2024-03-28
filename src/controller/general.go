@@ -9,11 +9,9 @@ import (
 // @Tags general
 // @Description 200 OKが返ってくれば起動済み
 // @Accept json
-// @Produce json
-// @Success 200 {object} schemas.ResponseMessage
+// @Produce plain
+// @Success 200 {string} string "Logvista API Server is running!"
 // @Router / [get]
 func HealthCheck(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{
-		"message": "OK",
-	})
+	c.String(http.StatusOK, "Logvista API Server is running!")
 }

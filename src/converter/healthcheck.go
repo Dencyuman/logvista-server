@@ -1,15 +1,12 @@
 package converter
 
 import (
-	"fmt"
 	"github.com/Dencyuman/logvista-server/src/models"
 	"github.com/Dencyuman/logvista-server/src/schemas"
-	"log"
-	"strconv"
 )
 
-// schemas.HealthcheckSiteTitleConfigBodyをmodels.HealthcheckConfigに変換
-func ConvertHealthcheckSiteTitleConfigBodyToModel(body *schemas.HealthcheckSiteTitleConfigBody) *models.HealthcheckConfig {
+// schemas.HealthcheckConfigBodyをmodels.HealthcheckConfigに変換
+func ConvertHealthcheckConfigBodyToModel(body *schemas.HealthcheckConfigBody) *models.HealthcheckConfig {
 	if body == nil {
 		return nil
 	}
@@ -17,108 +14,90 @@ func ConvertHealthcheckSiteTitleConfigBodyToModel(body *schemas.HealthcheckSiteT
 		SystemID:      body.SystemID,
 		Name:          body.Name,
 		Description:   body.Description,
-		ConfigType:    models.SiteTitle,
-		ExpectedValue: body.ExpectedTitle,
+		ConfigType:    body.ConfigType,
+		ExpectedValue: body.ExpectedValue,
 		Url:           body.Url,
-		Timespan:      body.Timespan,
+		IsActive:      body.IsActive,
 	}
 }
 
-// schemas.HealthcheckEndpointConfigBodyをmodels.HealthcheckConfigに変換
-func ConvertHealthcheckEndpointConfigBodyToModel(body *schemas.HealthcheckEndpointConfigBody) *models.HealthcheckConfig {
-	if body == nil {
-		return nil
-	}
-	return &models.HealthcheckConfig{
-		SystemID:      body.SystemID,
-		Name:          body.Name,
-		Description:   body.Description,
-		ConfigType:    models.Endpoint,
-		ExpectedValue: fmt.Sprintf("%d", body.ExpectedStatus),
-		Url:           body.Url,
-		Timespan:      body.Timespan,
-	}
-}
-
-// models.HealthcheckConfigをschemas.HealthcheckSiteTitleConfigResponseに変換
-func ConvertModelToHealthcheckSiteTitleConfigResponse(model *models.HealthcheckConfig) *schemas.HealthcheckSiteTitleConfigResponse {
+// models.HealthcheckConfigをschemas.HealthcheckConfigResponseに変換
+func ConvertModelToHealthcheckConfigResponse(model *models.HealthcheckConfig) *schemas.HealthcheckConfigResponse {
 	if model == nil {
 		return nil
 	}
-	return &schemas.HealthcheckSiteTitleConfigResponse{
+	return &schemas.HealthcheckConfigResponse{
+		ID:            model.ID,
 		SystemID:      model.SystemID,
 		Name:          model.Name,
 		Description:   model.Description,
-		ExpectedTitle: model.ExpectedValue,
+		ConfigType:    model.ConfigType,
+		ExpectedValue: model.ExpectedValue,
 		Url:           model.Url,
-		Timespan:      model.Timespan,
+		IsActive:      model.IsActive,
 		CreatedAt:     model.CreatedAt,
 		UpdatedAt:     model.UpdatedAt,
 	}
 }
 
-// models.HealthcheckConfigをschemas.HealthcheckEndpointConfigResponseに変換
-func ConvertModelToHealthcheckEndpointConfigResponse(model *models.HealthcheckConfig) *schemas.HealthcheckEndpointConfigResponse {
-	if model == nil {
-		return nil
-	}
-	expectedStatus, _ := strconv.Atoi(model.ExpectedValue) // Convert ExpectedValue string to int
-	return &schemas.HealthcheckEndpointConfigResponse{
-		SystemID:       model.SystemID,
-		Name:           model.Name,
-		Description:    model.Description,
-		ExpectedStatus: expectedStatus,
-		Url:            model.Url,
-		Timespan:       model.Timespan,
-		CreatedAt:      model.CreatedAt,
-		UpdatedAt:      model.UpdatedAt,
-	}
-}
-
 // HealthcheckConfigの配列をHealthcheckConfigsResponseに変換
 func ConvertHealthcheckConfigsToResponse(system models.System, configs []models.HealthcheckConfig) schemas.HealthcheckConfigsResponse {
-	siteTitleConfigs := []schemas.HealthcheckSiteTitleConfigResponse{}
-	endpointConfigs := []schemas.HealthcheckEndpointConfigResponse{}
+	ConfigResponses := []schemas.HealthcheckConfigResponse{}
 
 	for _, config := range configs {
-		switch config.ConfigType {
-		case models.SiteTitle:
-			siteTitleConfigs = append(siteTitleConfigs, schemas.HealthcheckSiteTitleConfigResponse{
-				SystemID:      config.SystemID,
-				Name:          config.Name,
-				Description:   config.Description,
-				ExpectedTitle: config.ExpectedValue,
-				Url:           config.Url,
-				Timespan:      config.Timespan,
-				CreatedAt:     config.CreatedAt,
-				UpdatedAt:     config.UpdatedAt,
-			})
-		case models.Endpoint:
-			// strconv.Atoiを使用してExpectedValueを整数に変換
-			expectedStatus, err := strconv.Atoi(config.ExpectedValue)
-			if err != nil {
-				log.Printf("Error converting ExpectedValue '%s' to int for system ID '%s': %v\n", config.ExpectedValue, config.SystemID, err)
-				expectedStatus = 0 // エラーがある場合のデフォルト値
-			}
-			endpointConfigs = append(endpointConfigs, schemas.HealthcheckEndpointConfigResponse{
-				SystemID:       config.SystemID,
-				Name:           config.Name,
-				Description:    config.Description,
-				ExpectedStatus: expectedStatus,
-				Url:            config.Url,
-				Timespan:       config.Timespan,
-				CreatedAt:      config.CreatedAt,
-				UpdatedAt:      config.UpdatedAt,
-			})
-		}
+		ConfigResponses = append(ConfigResponses, schemas.HealthcheckConfigResponse{
+			ID:            config.ID,
+			SystemID:      config.SystemID,
+			Name:          config.Name,
+			Description:   config.Description,
+			ConfigType:    config.ConfigType,
+			ExpectedValue: config.ExpectedValue,
+			Url:           config.Url,
+			IsActive:      config.IsActive,
+			CreatedAt:     config.CreatedAt,
+			UpdatedAt:     config.UpdatedAt,
+		})
 	}
 
 	// システムモデルをレスポンススキーマに変換
 	systemResponse := ConvertSystemModelToResponseSchema(&system)
 
 	return schemas.HealthcheckConfigsResponse{
-		SystemResponse:   *systemResponse,
-		SiteTitleConfigs: siteTitleConfigs,
-		EndpointConfigs:  endpointConfigs,
+		SystemResponse: *systemResponse,
+		Configs:        ConfigResponses,
+	}
+}
+
+// models.HealthcheckConfigをschemas.HealthcheckConfigResponseに変換
+func ConvertHealthcheckConfigToResponse(model *models.HealthcheckConfig) *schemas.HealthcheckConfigResponse {
+	if model == nil {
+		return nil
+	}
+	return &schemas.HealthcheckConfigResponse{
+		ID:            model.ID,
+		SystemID:      model.SystemID,
+		Name:          model.Name,
+		Description:   model.Description,
+		ConfigType:    model.ConfigType,
+		ExpectedValue: model.ExpectedValue,
+		Url:           model.Url,
+		IsActive:      model.IsActive,
+		CreatedAt:     model.CreatedAt,
+		UpdatedAt:     model.UpdatedAt,
+	}
+}
+
+// models.HealthcheckLogをschemas.HealthcheckLogsResponseに変換
+func ConvertModelToHealthcheckLogsResponse(model *models.HealthcheckLog) *schemas.HealthcheckLogsResponse {
+	if model == nil {
+		return nil
+	}
+	return &schemas.HealthcheckLogsResponse{
+		ID:                  model.ID,
+		IsAlive:             model.IsAlive,
+		ResponseValue:       model.ResponseValue,
+		HealthcheckConfigId: model.HealthcheckConfigId,
+		CreatedAt:           model.CreatedAt,
+		UpdatedAt:           model.UpdatedAt,
 	}
 }

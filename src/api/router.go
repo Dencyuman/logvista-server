@@ -47,12 +47,16 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 		}
 		HealthcheckGroup := v1.Group("/healthcheck")
 		{
-			HealthcheckGroup.GET("/configs", appController.GetHealthcheckConfigs)
-			HealthcheckGroup.GET("/configs/:systemId", appController.GetSystemHealthcheckConfigs)
-			HealthcheckGroup.POST("/configs/site-title/test", controller.TestHealthcheckSiteTitleConfig)
-			HealthcheckGroup.POST("/configs/site-title", appController.HealthcheckSiteTitleConfig)
-			HealthcheckGroup.POST("/configs/endpoint/test", controller.TestHealthcheckEndpointConfig)
-			HealthcheckGroup.POST("/configs/endpoint", appController.HealthcheckEndpointConfig)
+			ConfigGroup := HealthcheckGroup.Group("/configs")
+			{
+				ConfigGroup.GET("/", appController.GetHealthcheckConfigs)
+				ConfigGroup.GET("/:configId/logs", appController.GetHealthcheckLogs)
+				ConfigGroup.GET("/systems/:systemId", appController.GetSystemHealthcheckConfigs)
+				ConfigGroup.POST("/test", controller.TestHealthcheckConfig)
+				ConfigGroup.POST("/", appController.HealthcheckConfig)
+				ConfigGroup.PUT("/:configId", appController.UpdateHealthcheckConfig)
+				ConfigGroup.DELETE("/:configId", appController.DeleteHealthcheckConfig)
+			}
 		}
 	}
 
