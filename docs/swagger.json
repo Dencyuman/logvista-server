@@ -294,6 +294,63 @@
             }
         },
         "/healthcheck/configs/{configId}": {
+            "put": {
+                "description": "ヘルスチェックの設定を更新する",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "healthcheck"
+                ],
+                "summary": "ヘルスチェックConfig更新用エンドポイント",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Configのid",
+                        "name": "configId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "ヘルスチェック設定",
+                        "name": "config",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/schemas.HealthcheckConfigBody"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ResponseMessage"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ErrorResponse"
+                        }
+                    }
+                }
+            },
             "delete": {
                 "description": "ヘルスチェックの設定を削除する",
                 "consumes": [
@@ -317,9 +374,9 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Delete Success",
+                        "description": "OK",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/schemas.ResponseMessage"
                         }
                     },
                     "400": {
@@ -1375,6 +1432,14 @@
                     "description": "総ページ数",
                     "type": "integer",
                     "example": 10
+                }
+            }
+        },
+        "schemas.ResponseMessage": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
                 }
             }
         },

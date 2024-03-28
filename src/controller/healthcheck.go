@@ -270,6 +270,56 @@ func (ctrl *AppController) GetHealthcheckLogs(c *gin.Context) {
 	c.JSON(http.StatusOK, healthcheckLogsList)
 }
 
+// @Summary ヘルスチェックConfig更新用エンドポイント
+// @Description ヘルスチェックの設定を更新する
+// @Tags healthcheck
+// @Accept json
+// @Produce json
+// @Router /healthcheck/configs/{configId} [put]
+// @Param configId path string true "Configのid"
+// @Param config body schemas.HealthcheckConfigBody true "ヘルスチェック設定"
+// @Success 200 {object} schemas.ResponseMessage
+// @Failure 400 {object} schemas.ErrorResponse
+// @Failure 404 {object} schemas.ErrorResponse
+// @Failure 500 {object} schemas.ErrorResponse
+func (ctrl *AppController) UpdateHealthcheckConfig(c *gin.Context) {
+	configID := c.Param("configId")
+	if configID == "" {
+		c.JSON(http.StatusBadRequest, schemas.ErrorResponse{Message: "Config ID is required"})
+		return
+	}
+
+	config, err := crud.FindHealthcheckConfigByID(ctrl.DB, configID)
+	if err != nil {
+		c.JSON(http.StatusNotFound, schemas.ErrorResponse{Message: "Config Not Found"})
+		return
+	}
+
+	var configBody schemas.HealthcheckConfigBody
+	if err := c.ShouldBindJSON(&configBody); err != nil {
+		log.Printf("Error binding JSON: %v\n", err)
+		c.JSON(http.StatusBadRequest, schemas.ErrorResponse{Message: "Bad Request"})
+		return
+	}
+
+	config.SystemID = configBody.SystemID
+	config.Name = configBody.Name
+	config.Description = configBody.Description
+	config.ConfigType = configBody.ConfigType
+	config.ExpectedValue = configBody.ExpectedValue
+	config.Url = configBody.Url
+	config.IsActive = configBody.IsActive
+
+	if err := crud.UpdateHealthcheckConfig(ctrl.DB, config); err != nil {
+		c.JSON(http.StatusInternalServerError, schemas.ErrorResponse{Message: err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Update Success",
+	})
+}
+
 // @Summary ヘルスチェックConfig削除用エンドポイント
 // @Description ヘルスチェックの設定を削除する
 // @Tags healthcheck
@@ -277,7 +327,7 @@ func (ctrl *AppController) GetHealthcheckLogs(c *gin.Context) {
 // @Produce json
 // @Router /healthcheck/configs/{configId} [delete]
 // @Param configId path string true "Configのid"
-// @Success 200 {string} string "Delete Success"
+// @Success 200 {object} schemas.ResponseMessage
 // @Failure 400 {object} schemas.ErrorResponse
 // @Failure 404 {object} schemas.ErrorResponse
 // @Failure 500 {object} schemas.ErrorResponse
@@ -298,5 +348,7 @@ func (ctrl *AppController) DeleteHealthcheckConfig(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, "Delete Success")
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Delete Success",
+	})
 }

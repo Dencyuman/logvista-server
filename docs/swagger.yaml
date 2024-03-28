@@ -385,6 +385,11 @@ definitions:
         example: 10
         type: integer
     type: object
+  schemas.ResponseMessage:
+    properties:
+      message:
+        type: string
+    type: object
   schemas.Summary:
     properties:
       category:
@@ -576,9 +581,9 @@ paths:
       - application/json
       responses:
         "200":
-          description: Delete Success
+          description: OK
           schema:
-            type: string
+            $ref: '#/definitions/schemas.ResponseMessage'
         "400":
           description: Bad Request
           schema:
@@ -592,6 +597,44 @@ paths:
           schema:
             $ref: '#/definitions/schemas.ErrorResponse'
       summary: ヘルスチェックConfig削除用エンドポイント
+      tags:
+      - healthcheck
+    put:
+      consumes:
+      - application/json
+      description: ヘルスチェックの設定を更新する
+      parameters:
+      - description: Configのid
+        in: path
+        name: configId
+        required: true
+        type: string
+      - description: ヘルスチェック設定
+        in: body
+        name: config
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.HealthcheckConfigBody'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.ResponseMessage'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/schemas.ErrorResponse'
+      summary: ヘルスチェックConfig更新用エンドポイント
       tags:
       - healthcheck
   /healthcheck/configs/{configId}/logs:
