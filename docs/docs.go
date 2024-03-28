@@ -38,41 +38,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/healthcheck/configs/": {
-            "get": {
-                "description": "200 システム別ヘルスチェック設定一覧の取得",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "healthcheck"
-                ],
-                "summary": "ヘルスチェック設定取得用エンドポイント",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/schemas.HealthcheckConfigsResponse"
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/schemas.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/healthcheck/configs/endpoint": {
+        "/healthcheck/configs": {
             "post": {
-                "description": "200 Endpointヘルスチェックを設定する",
+                "description": "200 ヘルスチェックを設定する",
                 "consumes": [
                     "application/json"
                 ],
@@ -82,94 +50,10 @@ const docTemplate = `{
                 "tags": [
                     "healthcheck"
                 ],
-                "summary": "ヘルスチェック設定用エンドポイント(Endpoint)",
+                "summary": "ヘルスチェック設定用エンドポイント",
                 "parameters": [
                     {
-                        "description": "Endpoint用設定値",
-                        "name": "config",
-                        "in": "body",
-                        "schema": {
-                            "$ref": "#/definitions/schemas.HealthcheckConfigBody"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/schemas.HealthcheckConfigResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/schemas.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/healthcheck/configs/endpoint/test": {
-            "post": {
-                "description": "200 設定通りにEndpointヘルスチェックを１回実行した結果を取得できる",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "healthcheck"
-                ],
-                "summary": "ヘルスチェック設定テスト用エンドポイント(Endpoint)",
-                "parameters": [
-                    {
-                        "description": "Endpoint用設定値",
-                        "name": "config",
-                        "in": "body",
-                        "schema": {
-                            "$ref": "#/definitions/schemas.TestHealthcheckConfigBody"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/schemas.TestHealthcheckConfigResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/schemas.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/schemas.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/healthcheck/configs/site-title": {
-            "post": {
-                "description": "200 SiteTitleヘルスチェックを設定する",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "healthcheck"
-                ],
-                "summary": "ヘルスチェック設定用エンドポイント(SiteTitle)",
-                "parameters": [
-                    {
-                        "description": "SiteTitle用設定値",
+                        "description": "ヘルスチェック用設定値",
                         "name": "config",
                         "in": "body",
                         "schema": {
@@ -205,9 +89,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/healthcheck/configs/site-title/test": {
-            "post": {
-                "description": "200 設定通りにSiteTitleヘルスチェックを１回実行した結果を取得できる",
+        "/healthcheck/configs/": {
+            "get": {
+                "description": "200 システム別ヘルスチェック設定一覧の取得",
                 "consumes": [
                     "application/json"
                 ],
@@ -217,28 +101,15 @@ const docTemplate = `{
                 "tags": [
                     "healthcheck"
                 ],
-                "summary": "ヘルスチェック設定テスト用エンドポイント(SiteTitle)",
-                "parameters": [
-                    {
-                        "description": "SiteTitle用設定値",
-                        "name": "config",
-                        "in": "body",
-                        "schema": {
-                            "$ref": "#/definitions/schemas.TestHealthcheckConfigBody"
-                        }
-                    }
-                ],
+                "summary": "ヘルスチェック設定取得用エンドポイント",
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/schemas.TestHealthcheckConfigResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/schemas.ErrorResponse"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/schemas.HealthcheckConfigsResponse"
+                            }
                         }
                     },
                     "500": {
@@ -287,6 +158,51 @@ const docTemplate = `{
                     },
                     "404": {
                         "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/healthcheck/configs/test": {
+            "post": {
+                "description": "200 設定通りにヘルスチェックを１回実行した結果を取得できる",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "healthcheck"
+                ],
+                "summary": "ヘルスチェック設定テスト用エンドポイント",
+                "parameters": [
+                    {
+                        "description": "ヘルスチェック用設定値",
+                        "name": "config",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.TestHealthcheckConfigBody"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.TestHealthcheckConfigResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/schemas.ErrorResponse"
                         }
@@ -1060,6 +976,13 @@ const docTemplate = `{
                     "type": "string",
                     "example": "API Server"
                 },
+                "configs": {
+                    "description": "Config",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/schemas.HealthcheckConfigResponse"
+                    }
+                },
                 "created_at": {
                     "type": "string",
                     "example": "2023-01-01T00:00:00.000000+09:00"
@@ -1071,13 +994,6 @@ const docTemplate = `{
                 "name": {
                     "type": "string",
                     "example": "sample_system"
-                },
-                "site_title_configs": {
-                    "description": "Config",
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/schemas.HealthcheckConfigResponse"
-                    }
                 },
                 "updated_at": {
                     "type": "string",
@@ -1559,7 +1475,19 @@ const docTemplate = `{
         },
         "schemas.TestHealthcheckConfigBody": {
             "type": "object",
+            "required": [
+                "config_type"
+            ],
             "properties": {
+                "config_type": {
+                    "description": "設定タイプ",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.HealthcheckConfigType"
+                        }
+                    ],
+                    "example": "SiteTitle"
+                },
                 "expected_value": {
                     "description": "想定値",
                     "type": "string",
@@ -1574,7 +1502,19 @@ const docTemplate = `{
         },
         "schemas.TestHealthcheckConfigResponse": {
             "type": "object",
+            "required": [
+                "config_type"
+            ],
             "properties": {
+                "config_type": {
+                    "description": "設定タイプ",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.HealthcheckConfigType"
+                        }
+                    ],
+                    "example": "SiteTitle"
+                },
                 "expected_value": {
                     "description": "想定値",
                     "type": "string",

@@ -7,15 +7,17 @@ import (
 
 // swagger:request testHealthcheckConfigBody
 type TestHealthcheckConfigBody struct {
-	ExpectedValue string `json:"expected_value" example:"sampleValue"` // 想定値
-	Url           string `json:"url" example:"http://localhost:8080/"` // アクセス先url
+	ConfigType    models.HealthcheckConfigType `json:"config_type" binding:"required" example:"SiteTitle"` // 設定タイプ
+	ExpectedValue string                       `json:"expected_value" example:"sampleValue"`               // 想定値
+	Url           string                       `json:"url" example:"http://localhost:8080/"`               // アクセス先url
 }
 
 // swagger:response testHealthcheckConfigResponse
 type TestHealthcheckConfigResponse struct {
-	ExpectedValue     string `json:"expected_value" example:"sampleValue"` // 想定値
-	FetchedValue      string `json:"fetched-value" example:"sampleValue"`  // 取得された値
-	HealthcheckResult bool   `json:"healthcheck_result" example:"true"`    // ヘルスチェック結果
+	ConfigType        models.HealthcheckConfigType `json:"config_type" binding:"required" example:"SiteTitle"` // 設定タイプ
+	ExpectedValue     string                       `json:"expected_value" example:"sampleValue"`               // 想定値
+	FetchedValue      string                       `json:"fetched-value" example:"sampleValue"`                // 取得された値
+	HealthcheckResult bool                         `json:"healthcheck_result" example:"true"`                  // ヘルスチェック結果
 }
 
 // swagger:request healthcheckConfigBody
@@ -46,7 +48,7 @@ type HealthcheckConfigResponse struct {
 // swagger:response healthcheckConfigsResponse
 type HealthcheckConfigsResponse struct {
 	SystemResponse                             // システム情報
-	Configs        []HealthcheckConfigResponse `json:"site_title_configs"` // Config
+	Configs        []HealthcheckConfigResponse `json:"configs"` // Config
 }
 
 // swagger:response healthcheckLogsResponse
