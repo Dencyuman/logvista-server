@@ -25,8 +25,7 @@ type SystemResponse struct {
 // swagger:response summary
 type Summary struct {
 	SystemResponse
-	LatestLog LogResponse   `json:"latest_log" binding:"required"`
-	Data      []SummaryData `json:"data" binding:"required"`
+	Data []SummaryData `json:"data" binding:"required"`
 }
 
 // swagger:model summaryData
