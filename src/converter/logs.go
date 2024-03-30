@@ -163,7 +163,7 @@ func ConvertTracebackModelToResponseSchema(tbModel *models.Traceback) *schemas.T
 func ConvertSystemModelAndSummaryDataToSchema(
 	systemModel *models.System,
 	summaryData []schemas.SummaryData,
-	latestLog *models.Log,
+	// latestLog *models.Log,
 ) *schemas.Summary {
 	if systemModel == nil || summaryData == nil {
 		return nil
@@ -179,7 +179,6 @@ func ConvertSystemModelAndSummaryDataToSchema(
 			CreatedAt: systemModel.CreatedAt,
 			UpdatedAt: systemModel.UpdatedAt,
 		},
-		LatestLog: *ConvertLogModelToResponseSchema(latestLog),
-		Data:      summaryData,
+		Data: summaryData,
 	}
 }

@@ -405,8 +405,6 @@ definitions:
       id:
         example: 00000000-0000-0000-0000-000000000000
         type: string
-      latest_log:
-        $ref: '#/definitions/schemas.LogResponse'
       name:
         example: sample_system
         type: string
@@ -417,7 +415,6 @@ definitions:
     - created_at
     - data
     - id
-    - latest_log
     - updated_at
     type: object
   schemas.SummaryData:
@@ -1065,6 +1062,11 @@ paths:
         minimum: 1
         name: dataCount
         type: integer
+      - description: '基準日時: 指定しない場合は現在時刻を基準とする'
+        format: YYYY-MM-DD HH-MM-SS
+        in: query
+        name: baseDatetime
+        type: string
       produces:
       - application/json
       responses:

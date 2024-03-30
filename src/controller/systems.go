@@ -57,10 +57,24 @@ func (ctrl *AppController) GetSystems(c *gin.Context) {
 // @Param systemId query string false "システムid：指定しない場合は全てのシステムを取得"
 // @Param timeSpan query int false "集計時間スパン（秒）: 10秒刻みで指定可能" minimum(10) default(3600)
 // @Param dataCount query int false "取得データ個数" minimum(1) default(12)
+// @Param baseDatetime query string false "基準日時: 指定しない場合は現在時刻を基準とする" format(YYYY-MM-DD HH-MM-SS)
 // @Success 200 {object} []schemas.Summary
 // @Failure 400 {object} schemas.ErrorResponse
 // @Failure 500 {object} schemas.ErrorResponse
 func (ctrl *AppController) GetSystemSummary(c *gin.Context) {
+	datetimeStr := c.Query("baseDatetime")
+	layout := "2006-01-02 15-04-05"
+	var datetime time.Time
+	var err error
+	if datetimeStr == "" {
+		datetime = time.Now()
+	} else {
+		datetime, err = time.Parse(layout, datetimeStr)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, schemas.ErrorResponse{Message: "Invalid baseDatetime parameter. Please use the format 'YYYY-MM-DD HH-MM-SS'"})
+			return
+		}
+	}
 	timeSpanParam := c.DefaultQuery("timeSpan", "3600") // デフォルトを1時間とする
 	systemId := c.Query("systemId")                     // オプショナルのシステムid
 	dataCountParam := c.DefaultQuery("dataCount", "12") // デフォルトを12個とする
@@ -79,20 +93,19 @@ func (ctrl *AppController) GetSystemSummary(c *gin.Context) {
 		return
 	}
 
-	now := time.Now()
 	var roundedTime time.Time
 	if timeSpan >= 3600 {
 		// timeSpanが3600秒以上の場合は時間を切り捨てる
-		roundedHour := now.Hour() - now.Hour()%(timeSpan/3600)
-		roundedTime = time.Date(now.Year(), now.Month(), now.Day(), roundedHour, 0, 0, 0, now.Location())
+		roundedHour := datetime.Hour() - datetime.Hour()%(timeSpan/3600)
+		roundedTime = time.Date(datetime.Year(), datetime.Month(), datetime.Day(), roundedHour, 0, 0, 0, datetime.Location())
 	} else if timeSpan >= 60 {
 		// timeSpanが60秒以上、3600秒未満の場合は分を切り捨てる
-		roundedMinute := now.Minute() - now.Minute()%(timeSpan/60)
-		roundedTime = time.Date(now.Year(), now.Month(), now.Day(), now.Hour(), roundedMinute, 0, 0, now.Location())
+		roundedMinute := datetime.Minute() - datetime.Minute()%(timeSpan/60)
+		roundedTime = time.Date(datetime.Year(), datetime.Month(), datetime.Day(), datetime.Hour(), roundedMinute, 0, 0, datetime.Location())
 	} else {
 		// timeSpanが60秒未満の場合は秒を切り捨てる
-		extraSeconds := now.Second() % timeSpan
-		roundedTime = now.Add(time.Duration(-extraSeconds) * time.Second)
+		extraSeconds := datetime.Second() % timeSpan
+		roundedTime = datetime.Add(time.Duration(-extraSeconds) * time.Second)
 		// 秒以下を切り捨てるために、roundedTimeの秒をtimeSpanで割った商にtimeSpanを掛けたものに設定する
 		roundedTime = time.Date(roundedTime.Year(), roundedTime.Month(), roundedTime.Day(),
 			roundedTime.Hour(), roundedTime.Minute(), roundedTime.Second()/timeSpan*timeSpan, 0, roundedTime.Location())
@@ -126,13 +139,7 @@ func (ctrl *AppController) GetSystemSummary(c *gin.Context) {
 			c.JSON(http.StatusInternalServerError, schemas.ErrorResponse{Message: "Internal Server Error"})
 			return
 		}
-		latestLog, err := crud.FindLatestLog(ctrl.DB, modelsSystem.Name)
-		if err != nil {
-			log.Printf("Error finding latest log: %v\n", err)
-			c.JSON(http.StatusInternalServerError, schemas.ErrorResponse{Message: "Internal Server Error"})
-			return
-		}
-		summary := converter.ConvertSystemModelAndSummaryDataToSchema(&modelsSystem, summaryData, latestLog)
+		summary := converter.ConvertSystemModelAndSummaryDataToSchema(&modelsSystem, summaryData) //, latestLog)
 		if summary == nil {
 			log.Printf("Error converting system model and summary data to schema: %v\n", modelsSystem.ID)
 			continue

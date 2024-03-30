@@ -711,6 +711,13 @@ const docTemplate = `{
                         "description": "取得データ個数",
                         "name": "dataCount",
                         "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "format": "YYYY-MM-DD HH-MM-SS",
+                        "description": "基準日時: 指定しない場合は現在時刻を基準とする",
+                        "name": "baseDatetime",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -1372,7 +1379,6 @@ const docTemplate = `{
                 "created_at",
                 "data",
                 "id",
-                "latest_log",
                 "updated_at"
             ],
             "properties": {
@@ -1393,9 +1399,6 @@ const docTemplate = `{
                 "id": {
                     "type": "string",
                     "example": "00000000-0000-0000-0000-000000000000"
-                },
-                "latest_log": {
-                    "$ref": "#/definitions/schemas.LogResponse"
                 },
                 "name": {
                     "type": "string",
